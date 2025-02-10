@@ -76,3 +76,15 @@ async def test_get_new_word(client, test_user,  db_with_words, db_session, set_u
 
     assert response.status_code == 200
     assert len(response.json()['words']) == 5
+
+
+@pytest.mark.asyncio
+async def test_no_get_new_word(client, test_user,  db_session, set_up_cache, mock_tokens_service):
+    """Test getting a new word when there are no words in db"""
+
+    response = await client.get('api/v1/cards/', cookies={"token": "test_token"})
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "No more words in database"}
+
+
