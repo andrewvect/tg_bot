@@ -62,3 +62,17 @@ async def test_new_card_unknown_create(client, test_user, db_with_words, db_sess
 
     assert users_states[test_user.telegram_id].review_cards[0] == card[0].word_id
     assert users_states[test_user.telegram_id].created_cards[0] == card[0].word_id
+
+
+@pytest.mark.asyncio
+async def test_get_new_word(client, test_user,  db_with_words, db_session, set_up_cache, mock_tokens_service):
+    """Test getting a new word"""
+
+    response = await client.get('api/v1/cards/', cookies={"token": "test_token"})
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
+        response = await ac.get('api/v1/cards/', cookies={"token": "test_token"})
+
+    assert response.status_code == 200
+    assert len(response.json()['words']) == 5
