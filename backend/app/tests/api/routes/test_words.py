@@ -88,3 +88,29 @@ async def test_no_get_new_word(client, test_user,  db_session, set_up_cache, moc
     assert response.json() == {"detail": "No more words in database"}
 
 
+@pytest.mark.asyncio
+async def test_add_success_review(client, test_user, db_with_cards, db_session, cache_with_created_cards, mock_tokens_service):
+    """Test adding a review"""
+
+    response = await client.post('api/v1/cards/review/', json={"passed": True}, cookies={"token": "test_token"})
+
+    # check response
+    assert response.status_code == 200
+    assert response.json() == {"message": "Review added successfully"}
+
+    # check db
+    result = await db_session.execute(select(Card).where(Card.id == 1))
+    card = result.scalar()
+    await db_session.refresh(card)  # Refresh session
+    assert card.count_of_views == 2
+
+    # check cache
+    assert len(users_states[test_user.telegram_id].waiting_cards) == 1
+    assert len(users_states[test_user.telegram_id].review_cards) == len(
+        db_with_cards) - 1
+
+    assert len(users_states[test_user.telegram_id].waiting_cards) == 1
+    assert card.word_id in users_states[test_user.telegram_id].waiting_cards.values(
+    )
+
+
