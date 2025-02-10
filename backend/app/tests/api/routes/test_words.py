@@ -37,3 +37,28 @@ async def test_new_card_known_create(client, test_user, db_with_words, db_sessio
 
     assert users_states[test_user.telegram_id].known_cards[0] == card[0].word_id
     assert users_states[test_user.telegram_id].created_cards[0] == card[0].word_id
+@pytest.mark.asyncio
+async def test_new_card_unknown_create(client, test_user, db_with_words, db_session, set_up_cache, mock_tokens_service):
+    """Test creating a new card with known word"""
+
+    response = await client.post('/api/v1/cards/', json={"known": False}, cookies={"token": "test_token"})
+
+    # check response
+    assert response.status_code == 200
+    assert response.json() == {"message": "Word card created successfully"}
+    # check db
+    card = await db_session.execute(select(Card))
+    card = card.scalars().all()
+    assert len(card) == 1
+    assert card[0].user_id == test_user.telegram_id
+    assert card[0].count_of_views == 1
+
+    # check cache
+    assert len(users_states[test_user.telegram_id].created_cards) == 1
+    assert len(users_states[test_user.telegram_id].known_cards) == 0
+
+    assert len(users_states[test_user.telegram_id].review_cards) == 1
+    assert len(users_states[test_user.telegram_id].waiting_cards) == 0
+
+    assert users_states[test_user.telegram_id].review_cards[0] == card[0].word_id
+    assert users_states[test_user.telegram_id].created_cards[0] == card[0].word_id
