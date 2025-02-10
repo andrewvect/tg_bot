@@ -114,3 +114,23 @@ async def test_add_success_review(client, test_user, db_with_cards, db_session, 
     )
 
 
+@pytest.mark.asyncio
+async def test_add_fail_review(client, test_user, db_with_cards, db_session, cache_with_created_cards, mock_tokens_service):
+    """Test adding a fail review"""
+
+    response = await client.post('api/v1/cards/review/', json={"passed": False}, cookies={"token": "test_token"})
+
+    # check response
+    assert response.status_code == 200
+    assert response.json() == {"message": "Review added successfully"}
+
+    # check db
+    result = await db_session.execute(select(Card).where(Card.id == 1))
+    card = result.scalar()
+    await db_session.refresh(card)  # Refresh session
+    assert card.count_of_views == 1
+
+    # check cache
+    assert len(users_states[test_user.telegram_id].waiting_cards) == 0
+    assert len(users_states[test_user.telegram_id].review_cards) == len(
+        db_with_cards)
