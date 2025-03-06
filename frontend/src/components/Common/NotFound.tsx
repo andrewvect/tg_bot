@@ -19,7 +19,7 @@ const NotFound = () => {
           lineHeight="1"
           mb={4}
         >
-          404
+          405
         </Text>
         <Text fontSize="md">Oops!</Text>
         <Text fontSize="md">Page not found.</Text>
