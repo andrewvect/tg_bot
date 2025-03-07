@@ -2,7 +2,7 @@ from collections.abc import Generator
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -10,8 +10,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core import security
 from app.core.config import settings
-from app.core.db import engine
-from app.models import TokenPayload, User
+from app.common.cache import users_states
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -51,3 +50,10 @@ def get_bot_instance() -> Bot:
 
 
 BotDep = Annotated[Bot, Depends(get_bot_instance)]
+
+
+def get_cache() -> dict:
+    return users_states
+
+
+CacheDep = Annotated[dict, Depends(get_cache)]
