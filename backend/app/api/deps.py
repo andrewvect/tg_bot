@@ -12,6 +12,7 @@ from app.core import security
 from app.core.config import settings
 from app.words import WordCardHandler
 from app.common.cache import users_states
+from app.token_service import TokensService
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -66,3 +67,10 @@ def get_word_card_handler(db: DbDep, cache: CacheDep) -> WordCardHandler:
 
 
 WordCardHandlerDep = Annotated[WordCardHandler, Depends(get_word_card_handler)]
+
+
+def get_tokens_service() -> TokensService:
+    return TokensService(config=settings, safe_parse_webapp_init_data=safe_parse_webapp_init_data)
+
+
+TokensServiceDep = Annotated[TokensService, Depends(get_tokens_service)]
