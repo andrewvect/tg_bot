@@ -13,6 +13,7 @@ from app.core.config import settings
 from app.words import WordCardHandler
 from app.common.cache import users_states
 from app.token_service import TokensService
+from app.common.db import Database
 from app.common.db.repositories import SettingsRepo
 
 reusable_oauth2 = OAuth2PasswordBearer(
