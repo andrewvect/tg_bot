@@ -9,6 +9,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from aiogram import Bot
+from aiogram.utils.web_app import safe_parse_webapp_init_data
+
 from app.core.config import settings
 from app.words import WordCardHandler
 from app.common.cache import users_states
