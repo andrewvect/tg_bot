@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core import security
 from app.core.config import settings
+from app.words import WordCardHandler
 from app.common.cache import users_states
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -57,3 +58,11 @@ def get_cache() -> dict:
 
 
 CacheDep = Annotated[dict, Depends(get_cache)]
+
+
+def get_word_card_handler(db: DbDep, cache: CacheDep) -> WordCardHandler:
+    """Get an instance of WordCardHandler with database session and cache dependencies."""
+    return WordCardHandler(db=db, cache=cache, review_algorithm=review_algorithm)
+
+
+WordCardHandlerDep = Annotated[WordCardHandler, Depends(get_word_card_handler)]
