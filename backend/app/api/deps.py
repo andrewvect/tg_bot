@@ -1,14 +1,14 @@
-from collections.abc import Generator
+from collections.abc import AsyncGenerator, AsyncIterator
 from typing import Annotated
 
-import jwt
+from app.utils.review_alogritm import review_algorithm
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from app.core import security
+from aiogram import Bot
 from app.core.config import settings
 from app.words import WordCardHandler
 from app.common.cache import users_states
