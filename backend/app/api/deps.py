@@ -13,6 +13,7 @@ from app.core.config import settings
 from app.words import WordCardHandler
 from app.common.cache import users_states
 from app.token_service import TokensService
+from app.common.db.repositories import SettingsRepo
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -74,3 +75,8 @@ def get_tokens_service() -> TokensService:
 
 
 TokensServiceDep = Annotated[TokensService, Depends(get_tokens_service)]
+
+def get_settings_repo(session: SessionDep) -> SettingsRepo:
+    return SettingsRepo(session=session)
+
+SettingsRepoDep = Annotated[SettingsRepo, Depends(get_settings_repo)]
