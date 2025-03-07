@@ -42,3 +42,5 @@ TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
 async def get_db(session: SessionDep) -> Database:
     return Database(session=session)
+
+DbDep = Annotated[Database, Depends(get_db)]
