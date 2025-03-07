@@ -44,3 +44,10 @@ async def get_db(session: SessionDep) -> Database:
     return Database(session=session)
 
 DbDep = Annotated[Database, Depends(get_db)]
+
+
+def get_bot_instance() -> Bot:
+    return Bot(token=settings.BOT_TOKEN)
+
+
+BotDep = Annotated[Bot, Depends(get_bot_instance)]
