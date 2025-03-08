@@ -29,7 +29,7 @@ async def get_session() -> AsyncIterator[AsyncSession]:
             str(settings.ASYNC_SQLALCHEMY_DATABASE_URI),
             pool_size=20,
             max_overflow=10,
-            pool_recycle=3600  # recycle connections after 1 hour
+            pool_recycle=3600,  # recycle connections after 1 hour
         )
 
         async_session = sessionmaker(
@@ -47,6 +47,7 @@ TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
 async def get_db(session: SessionDep) -> Database:
     return Database(session=session)
+
 
 DbDep = Annotated[Database, Depends(get_db)]
 
@@ -74,12 +75,16 @@ WordCardHandlerDep = Annotated[WordCardHandler, Depends(get_word_card_handler)]
 
 
 def get_tokens_service() -> TokensService:
-    return TokensService(config=settings, safe_parse_webapp_init_data=safe_parse_webapp_init_data)
+    return TokensService(
+        config=settings, safe_parse_webapp_init_data=safe_parse_webapp_init_data
+    )
 
 
 TokensServiceDep = Annotated[TokensService, Depends(get_tokens_service)]
 
+
 def get_settings_repo(session: SessionDep) -> SettingsRepo:
     return SettingsRepo(session=session)
+
 
 SettingsRepoDep = Annotated[SettingsRepo, Depends(get_settings_repo)]
