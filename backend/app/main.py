@@ -1,3 +1,7 @@
+"""Main FastAPI application."""
+
+from contextlib import asynccontextmanager
+
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
@@ -5,6 +9,15 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
 from app.core.config import settings
+from app.states import get_users_states
+
+
+@asynccontextmanager
+async def set_up(app: FastAPI):
+    """Set up user states."""
+    global users_states
+    users_states = await get_users_states()
+    yield
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
@@ -18,13 +31,14 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     generate_unique_id_function=custom_generate_unique_id,
+    lifespan=set_up,
 )
 
 # Set all CORS enabled origins
 if settings.all_cors_origins:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.all_cors_origins,
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
