@@ -1,7 +1,9 @@
+"""Module to check if the database is awake before starting the service."""
+
 import logging
 
-from sqlalchemy import Engine
-from sqlmodel import Session, select
+from sqlalchemy import Engine, text
+from sqlalchemy.orm import Session
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
 from app.core.db import engine
@@ -23,7 +25,8 @@ def init(db_engine: Engine) -> None:
     try:
         with Session(db_engine) as session:
             # Try to create session to check if DB is awake
-            session.exec(select(1))
+            session.execute(text("SELECT 1"))
+            session.commit()
     except Exception as e:
         logger.error(e)
         raise e
