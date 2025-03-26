@@ -13,7 +13,7 @@ from app.states import get_users_states
 
 
 @asynccontextmanager
-async def set_up(app: FastAPI):
+async def set_up():
     """Set up user states."""
     global users_states
     users_states = await get_users_states()
@@ -24,24 +24,31 @@ def custom_generate_unique_id(route: APIRoute) -> str:
     return f"{route.tags[0]}-{route.name}"
 
 
-if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
-    sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
+def create_app() -> FastAPI:
+    """Create FastAPI app instance with the current settings configuration."""
+    if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
+        sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    generate_unique_id_function=custom_generate_unique_id,
-    lifespan=set_up,
-)
-
-# Set all CORS enabled origins
-if settings.all_cors_origins:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+    app = FastAPI(
+        title=settings.PROJECT_NAME,
+        openapi_url=f"{settings.API_V1_STR}/openapi.json",
+        generate_unique_id_function=custom_generate_unique_id,
+        lifespan=set_up,
     )
 
-app.include_router(api_router, prefix=settings.API_V1_STR)
+    # Set all CORS enabled origins
+    if settings.all_cors_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+
+    app.include_router(api_router, prefix=settings.API_V1_STR)
+    return app
+
+
+# Create the default app instance
+app = create_app()
