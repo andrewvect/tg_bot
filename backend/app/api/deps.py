@@ -13,7 +13,7 @@ from app.common.db import Database
 from app.common.db.repositories import SettingsRepo
 from app.core.config import settings
 from app.token_service import TokensService
-from app.utils.review_alogritm import review_algorithm
+from app.utils.review_algoritm import review_algorithm
 from app.words import WordCardHandler
 
 reusable_oauth2 = OAuth2PasswordBearer(
