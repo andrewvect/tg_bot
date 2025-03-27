@@ -1,6 +1,6 @@
 """Word model file."""
 
-from typing import List, Optional
+
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -16,25 +16,28 @@ class Word(Base):
     foreign_word: Mapped[str] = mapped_column(
         String(100), unique=True, nullable=False, index=True
     )
-    """The foreign word (non-native language)."""
+    """The foreign word (non-native language) Latin."""
 
     native_word: Mapped[str] = mapped_column(String(100), nullable=False)
     """The native word (translated version)."""
 
-    image: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    cyrillic_word: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    """The Cyrillic word (translated version)."""
+
+    image: Mapped[str | None] = mapped_column(String, nullable=True)
     """Optional image associated with the word."""
 
-    legend: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    legend: Mapped[str | None] = mapped_column(String, nullable=True)
     """Optional legend for the word."""
 
-    transcription: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    transcription: Mapped[str | None] = mapped_column(String, nullable=True)
     """Optional transcription for the word."""
 
-    voice_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    voice_id: Mapped[str | None] = mapped_column(String, nullable=True)
     """Optional voice ID for the word pronunciation."""
 
     # Relationships
-    sentences: Mapped[Optional[List["Sentence"]]] = relationship(
+    sentences: Mapped[list["Sentence"] | None] = relationship(
         "Sentence", uselist=True, lazy="joined", cascade="all, delete"
     )
     """Related sentences using the word."""
