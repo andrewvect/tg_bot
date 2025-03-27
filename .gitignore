@@ -7,4 +7,12 @@ node_modules/
 .env
 .ruff_cache/
 .pytest_cache/
-.env
+
+
+.vscode/launch.json
+.DS_Store
+backend/.DS_Store
+backend/app/.DS_Store
+serbian_words_with_counts.txt
+words copy.yaml
+words.yaml
