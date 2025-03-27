@@ -1,19 +1,13 @@
 import { extendTheme } from "@chakra-ui/react"
 
-const disabledStyles = {
-  _disabled: {
-    backgroundColor: "ui.main",
-  },
-}
-
 const theme = extendTheme({
   colors: {
     ui: {
-      main: "#009688",
+      main: "#000000", // black background
       secondary: "#EDF2F7",
       success: "#48BB78",
       danger: "#E53E3E",
-      light: "#FAFAFA",
+      light: "#ffffff", // white text
       dark: "#1A202C",
       darkSlate: "#252D3D",
       dim: "#A0AEC0",
@@ -26,20 +20,18 @@ const theme = extendTheme({
           backgroundColor: "ui.main",
           color: "ui.light",
           _hover: {
-            backgroundColor: "#00766C",
+            backgroundColor: "#000000", // keep black on hover
           },
           _disabled: {
-            ...disabledStyles,
-            _hover: {
-              ...disabledStyles,
-            },
+            backgroundColor: "ui.main",
+            color: "ui.light",
           },
         },
         danger: {
-          backgroundColor: "ui.danger",
+          backgroundColor: "ui.main",
           color: "ui.light",
           _hover: {
-            backgroundColor: "#E32727",
+            backgroundColor: "#000000",
           },
         },
       },
