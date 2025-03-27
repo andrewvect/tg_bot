@@ -1,44 +1,46 @@
-from collections.abc import AsyncGenerator, AsyncIterator
+from collections.abc import AsyncGenerator
 from typing import Annotated
-
-from app.utils.review_alogritm import review_algorithm
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine
 
 from aiogram import Bot
 from aiogram.utils.web_app import safe_parse_webapp_init_data
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
-from app.core.config import settings
-from app.words import WordCardHandler
 from app.common.cache import users_states
-from app.token_service import TokensService
 from app.common.db import Database
 from app.common.db.repositories import SettingsRepo
+from app.core.config import settings
+from app.token_service import TokensService
+from app.utils.review_alogritm import review_algorithm
+from app.words import WordCardHandler
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
 )
 
+# Create engine once at module level
+engine = create_async_engine(
+    str(settings.ASYNC_SQLALCHEMY_DATABASE_URI),
+    pool_size=10,
+    max_overflow=20,
+)
 
-async def get_session() -> AsyncIterator[AsyncSession]:
+async_session_factory = sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
+
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    session = async_session_factory()
     try:
-        engine = create_async_engine(
-            str(settings.ASYNC_SQLALCHEMY_DATABASE_URI),
-            pool_size=20,
-            max_overflow=10,
-            pool_recycle=3600,  # recycle connections after 1 hour
-        )
-
-        async_session = sessionmaker(
-            engine, class_=AsyncSession, expire_on_commit=False, future=True
-        )
-        session = async_session()
         yield session
     finally:
-        await session.close()
+        try:
+            await session.close()
+        except Exception:
+            pass
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
