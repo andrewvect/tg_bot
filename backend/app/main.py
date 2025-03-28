@@ -13,7 +13,7 @@ from app.states import get_users_states
 
 
 @asynccontextmanager
-async def set_up():
+async def set_up(app):
     """Set up user states."""
     global users_states
     users_states = await get_users_states()

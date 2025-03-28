@@ -75,4 +75,8 @@ class GitWordParser:
 if __name__ == "__main__":
     # No need for logging.basicConfig as we're using the custom logger
     parser = GitWordParser(config=settings)
+    try:
+        parser.save_words_to_db()
+    except Exception:
+        pass
     parser.update_word_in_db()
