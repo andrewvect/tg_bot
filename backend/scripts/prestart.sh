@@ -9,3 +9,6 @@ alembic upgrade head
 
 # Update the database
 python app/scripts/parse_git_words.py
+
+# Update webhook
+python app/scripts/tg_webhook.py
