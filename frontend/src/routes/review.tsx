@@ -116,6 +116,9 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
     const [showTranslation, setShowTranslation] = useState<{ [key: number]: boolean }>({})
     const currentWord = words[0]
     const [isProcessing, setIsProcessing] = useState(false)
+    const [flipped, setFlipped] = useState(true)
+    const [displayWord, setDisplayWord] = useState<string>('')
+    const [displayTranslation, setDisplayTranslation] = useState<string>('')
 
     useEffect(() => {
         fetchReviewWords().then((words) => {
@@ -123,6 +126,28 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
             setLoading(false)
         })
     }, [])
+
+    useEffect(() => {
+        if (currentWord) {
+            setDisplayWord(currentWord.word);
+            setDisplayTranslation(currentWord.translation);
+        }
+        if (flipped && currentWord) {
+            if (spoilerSettings === 2) {
+                setDisplayTranslation(currentWord.word);
+                setDisplayWord(currentWord.translation);
+            } else if (spoilerSettings === 3) {
+                const random = Math.random();
+                if (random < 0.5) {
+                    setDisplayTranslation(currentWord.word);
+                    setDisplayWord(currentWord.translation);
+                } else {
+                    setDisplayWord(currentWord.word);
+                    setDisplayTranslation(currentWord.translation);
+                }
+            }
+        }
+    }, [flipped, currentWord, spoilerSettings]);
 
     const handleReview = (passed: boolean) => {
         if (isProcessing || !currentWord) return
@@ -147,24 +172,6 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
           })
     }
 
-    // Apply spoiler settings only if currentWord exists
-    let displayWord = currentWord?.word || '';
-    let displayTranslation = currentWord?.translation || '';
-
-    if (currentWord) {
-        if (spoilerSettings === 2) {
-            displayTranslation = currentWord.word;
-            displayWord = currentWord.translation;
-        } else if (spoilerSettings === 3) {
-            const random = Math.random();
-            if (random < 0.5) {
-                displayTranslation = currentWord.word;
-            } else {
-                displayWord = currentWord.translation;
-            }
-        }
-    }
-
     if (!currentWord) {
         return <Loading />;
     }
@@ -179,7 +186,10 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                         </Text>
                     )}
                     <Button
-                        onClick={() => setShowTranslation(prev => ({ ...prev, [currentWord.word_id]: true }))}
+                        onClick={() => {
+                            setShowTranslation(prev => ({ ...prev, [currentWord.word_id]: true }));
+                            setFlipped(true); // Ensure flipped is toggled correctly
+                        }}
                         hidden={showTranslation[currentWord.word_id]}
                         isDisabled={isProcessing}
                     >
