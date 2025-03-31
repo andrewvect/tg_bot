@@ -46,10 +46,12 @@ function NewWord() {
         loadWords()
     }, [])
 
-    async function loadWords() {
+    async function loadWords(optionalInt?: number) {
         setLoading(true)
+
         const token = localStorage.getItem('token')
 
+        if (!optionalInt) {
         try {
             const response = await UtilsService.getNewWord({ authorization: `Bearer ${token}` })
             if (response.words.length > 0) {
@@ -66,6 +68,25 @@ function NewWord() {
             }
         } finally {
             setLoading(false)
+        }
+        } else {
+            try {
+                const response = await UtilsService.getNewWord({ authorization: `Bearer ${token}` })
+                if (response.words.length > 0) {
+                    localStorage.setItem('new_words', JSON.stringify(response.words))
+                    setWords(response.words)
+                } else {
+                    localStorage.setItem('new_words', JSON.stringify([]))
+                    setWords([])
+                }
+            } catch (error: any) {
+                if (error.response?.status === 400) {
+                    localStorage.setItem('new_words', JSON.stringify([]))
+                    setWords([])
+                }
+            } finally {
+                setLoading(false)
+            }
         }
     }
 
@@ -116,8 +137,8 @@ function NewWord() {
         const newList = words.slice(1)
         localStorage.setItem('new_words', JSON.stringify(newList))
         setWords(newList)
-        if (newList.length === 0) {
-            loadWords()
+        if (newList.length < 2) {
+            loadWords(2)
         }
     }
 
