@@ -43,7 +43,7 @@ async def webhook(request: Request) -> Response:
 
     try:
         bot = Bot(token=settings.BOT_TOKEN)
-        bot.session.api = TEST
+        # bot.session.api = TEST
 
         await dispatcher.feed_update(
             update=update,
