@@ -12,7 +12,7 @@ export function CardComponent({ header, children }: CardComponentProps) {
                 <Center>
                     <VStack>
                         <CardHeader>
-                            <Text fontSize="5xl" fontWeight="bold" color="white">{header}</Text>
+                            <Text fontSize="7xl" fontWeight="bold" color="white">{header}</Text>
                         </CardHeader>
                         {children}
                     </VStack>
