@@ -22,11 +22,11 @@ async def delete_telegram_webhook(bot) -> bool:
 
 
 async def set_telegram_webhook(bot: Bot) -> bool:
-    webhook_url = "https://" + settings.DOMAIN + settings.API_V1_STR + "/webhook"
+    webhook_url = "https://"+ "api." + settings.DOMAIN + settings.API_V1_STR + "/webhook"
     try:
         result = await bot.set_webhook(url=webhook_url)
         if result:
-            logger.info("Webhook set successfully")
+            logger.info(f"Webhook set successfully {webhook_url}")
             return True
         else:
             logger.error("Failed to set webhook")
@@ -36,10 +36,13 @@ async def set_telegram_webhook(bot: Bot) -> bool:
 
 
 async def main():
-    bot = Bot(token=settings.BOT_TOKEN)
-    await delete_telegram_webhook(bot)
-    await asyncio.sleep(1)
-    await set_telegram_webhook(bot)
+    try:
+        bot = Bot(token=settings.BOT_TOKEN)
+        await delete_telegram_webhook(bot)
+        await asyncio.sleep(1)
+        await set_telegram_webhook(bot)
+    except Exception as e:
+        logger.error(str(e))
 
 
 if __name__ == "__main__":
