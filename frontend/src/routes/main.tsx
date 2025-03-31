@@ -31,7 +31,7 @@ function Main() {
         <BackgroundBox>
             <Container>
                 <AbsoluteCenter>
-                    <VStack spacing={1} width="300px">
+                    <VStack spacing={5} width="300px" height="200px">
                         <Button variant='primary' width="100%" onClick={() => navigate({ to: '/new' })}>
                             Добавить новые слова
                         </Button>

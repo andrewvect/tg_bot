@@ -19,6 +19,8 @@ const theme = extendTheme({
         primary: {
           backgroundColor: "ui.main",
           color: "ui.light",
+          fontWeight: "bold", // makes text bold
+          fontSize: "2xl", // increases text size (you can also use values like "20px", etc.)
           _hover: {
             backgroundColor: "#000000", // keep black on hover
           },
@@ -30,6 +32,8 @@ const theme = extendTheme({
         danger: {
           backgroundColor: "ui.main",
           color: "ui.light",
+          fontWeight: "bold",
+          fontSize: "lg",
           _hover: {
             backgroundColor: "#000000",
           },
