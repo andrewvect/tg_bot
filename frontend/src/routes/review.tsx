@@ -174,7 +174,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
             <AbsoluteCenter>
                 <CardComponent header={displayWord}>
                     {showTranslation[currentWord.word_id] && (
-                        <Text fontSize={'3xl'} color="white">
+                        <Text fontSize={'5xl'} color="white">
                             {displayTranslation}
                         </Text>
                     )}
