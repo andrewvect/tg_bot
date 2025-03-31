@@ -125,11 +125,11 @@ function NewWord() {
         <BackgroundBox>
             <AbsoluteCenter>
                 <CardComponent header={currentWord?.translation ?? ''}>
-                    <Text color={'white'} fontSize="3xl" fontWeight="bold">
+                    <Text color={'white'} fontSize="5xl" fontWeight="bold">
                         {currentWord?.word ?? ''}
                     </Text>
                 </CardComponent>
-                <VStack spacing={1} width="300px" mt="5px">
+                <VStack spacing={3} width="300px" mt="5px">
                     <Stack direction='row' width="100%">
                         <Button variant='primary' width="50%" onClick={handleAddCard}>Добавить</Button>
                         <Button variant='primary' width="50%" onClick={handleSkipCard}>Уже знаю</Button>
