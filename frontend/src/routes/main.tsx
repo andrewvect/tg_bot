@@ -40,7 +40,7 @@ function Main() {
                                 Повторить слова
                             </Button>
                             <Circle
-                                size="6"
+                                size="8"
                                 bg="red"
                                 color="white"
                                 position="absolute"
