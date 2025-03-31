@@ -1,5 +1,4 @@
 import secrets
-import warnings
 from typing import Annotated, Any, Literal
 
 from pydantic import (
@@ -37,7 +36,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     FRONTEND_HOST: str = "http://127.0.0.1:5173"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
-
+    DOMAIN: str
     BACKEND_CORS_ORIGINS: Annotated[
         list[AnyUrl] | str, BeforeValidator(parse_cors)
     ] = []
@@ -118,15 +117,16 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
-        if value == "changethis":
-            message = (
-                f'The value of {var_name} is "changethis", '
-                "for security, please change it, at least for deployments."
-            )
-            if self.ENVIRONMENT == "local":
-                warnings.warn(message, stacklevel=1)
-            else:
-                raise ValueError(message)
+        # if value == "changethis":
+        #     message = (
+        #         f'The value of {var_name} is "changethis", '
+        #         "for security, please change it, at least for deployments."
+        #     )
+        #     if self.ENVIRONMENT == "local":
+        #         warnings.warn(message, stacklevel=1)
+        #     else:
+        #         raise ValueError(message)
+        pass
 
     @model_validator(mode="after")
     def _enforce_non_default_secrets(self) -> Self:

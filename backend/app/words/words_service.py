@@ -1,3 +1,5 @@
+import datetime
+
 from app.common.cache.states import UserProfile
 from app.common.db.database import Database
 from app.common.db.models import Word
@@ -23,7 +25,7 @@ class WordCardHandler:
     ):
         self.db = db
         self.cache = cache
-        self.review_algorithm = review_algorithm
+        self.review_algorithm: callable = review_algorithm
 
     async def create_new_card(
         self, telegram_id: int, known: bool, word_id: int
@@ -82,6 +84,8 @@ class WordCardHandler:
     ) -> list[WordResponse]:
         """Get words for review"""
 
+        self._refresh_user_reviews(user_id)
+
         if len(self.cache[user_id].review_cards) < limit:
             limit = len(self.cache[user_id].review_cards)
 
@@ -96,3 +100,11 @@ class WordCardHandler:
     def get_review_words_count(self, user_id: int) -> int:
         """Get count of words for review"""
         return len(self.cache[user_id].review_cards)
+
+    def _refresh_user_reviews(self, user_id):
+        for date_review, word_id in self.cache[user_id].waiting_cards.items():
+            if date_review < int(datetime.datetime.now().timestamp()):
+                self.cache[user_id].review_cards.append(word_id)
+                del self.cache[user_id].waiting_cards[date_review]
+            else:
+                break
