@@ -57,13 +57,15 @@ class StatesCreator:
         for user in users:
             telegram_id = user.telegram_id
             created_cards = await self.db.card.fetch_many(
-                self.db.card.type_model.user_id == telegram_id
+                self.db.card.type_model.user_id == telegram_id, limit=10000
             )
+
+            review_cards, waiting_cards = self._fill_review_waiting_cards(created_cards)
 
             user_state = UserProfile(
                 created_cards=self._fill_created_cards(created_cards),
-                review_cards=self._fill_cards_to_review(created_cards),
-                waiting_cards=self._fill_waiting_cards(created_cards),
+                review_cards=review_cards,
+                waiting_cards=waiting_cards,
             )
 
             self.cache[telegram_id] = user_state
@@ -72,26 +74,29 @@ class StatesCreator:
     def _fill_created_cards(self, cards: list[Card]) -> SortedList[int]:
         created_cards = SortedList()
         for card in cards:
-            created_cards.add(card.id)
+            created_cards.add(card.word_id)
         return created_cards
 
-    def _fill_cards_to_review(self, cards: list[Card]) -> list[int]:
+    def _fill_review_waiting_cards(
+        self, cards: list[Card]
+    ) -> tuple[list[int], SortedDict[int, int]]:
         cards_to_review = []
-        for card in cards:
-            if (
-                self.review_algorithm(card.last_view, card.count_of_views)
-                < datetime.now()
-            ):
-                cards_to_review.append(card.id)
-        return cards_to_review
-
-    def _fill_waiting_cards(self, cards: list[Card]) -> SortedDict[int, int]:
         waiting_cards = SortedDict()
         for card in cards:
+            current_time = datetime.now()
             review_date = self.review_algorithm(card.last_view, card.count_of_views)
-            if review_date > datetime.now():
-                waiting_cards[int(review_date.timestamp())] = card.id
-        return waiting_cards
+            if card.count_of_views == 20:
+                pass
+
+            elif (
+                self.review_algorithm(card.last_view, card.count_of_views)
+                < current_time
+            ):
+                cards_to_review.append(card.word_id)
+            else:
+                waiting_cards[int(review_date.timestamp())] = card.word_id
+
+        return cards_to_review, waiting_cards
 
     def add_new_user(self, user_id: int):
         self.cache[user_id] = UserProfile(
