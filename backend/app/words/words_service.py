@@ -60,11 +60,13 @@ class WordCardHandler:
         """Get new words for user"""
 
         if len(self.cache[user_id].created_cards) == 0:
-            lats_word_id = 0
+            latest_word_id = 0
         else:
-            lats_word_id = self.cache[user_id].created_cards[-1]
+            latest_word_id = self.cache[user_id].created_cards[-1]
 
-        words = await self.db.word.get_new_words(limit=limit, last_word_id=lats_word_id)
+        words = await self.db.word.get_new_words(
+            limit=limit, last_word_id=latest_word_id
+        )
         if not words:
             raise EndWordsInDb("No more words in database")
         return words
