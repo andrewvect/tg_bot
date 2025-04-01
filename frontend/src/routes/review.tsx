@@ -77,11 +77,11 @@ function ReviewPage() {
         })
         getReviewWordsCount()
         .then((count: number) => {
+            console.log("Fetched review words count:", count); // Debugging log
             setCount(count);
             setLoading(false);
-            setProgresBar(count)
+            setProgresBar(count); // Ensure progressBar is set correctly
         })
-
     }, [])
 
     if (isLoading) {
@@ -205,30 +205,28 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                             <CloseIcon boxSize="6" strokeWidth="2px" />
                         </Button>
                     </Stack>
-                    <Button variant='primary' width="100%" onClick={() => navigate({ to: '/main' })}>Назад в меню</Button>
                 </VStack>
-                <Progress
-                    value={reviewWordsCount}
-                    max={progressBar}
-                    mt="5"
-                    height="1px"
-                    sx={{
-                        bg: 'black',
-                        '& > div': {
-                            bg: 'white',
-                        },
-                    }}
-                />
-            <VStack>
-            <Box>
-                <Text color='white'>
-                    {reviewWordsCount}
-                </Text>
-            </Box>
-            </VStack>
+                <Box height="40px" />
+                <Box width="300px" mt="10px"> {/* Move Progress outside VStack */}
+                    <Progress
+                        value={reviewWordsCount}
+                        max={progressBar || 1} // Fallback to prevent division by zero
+                        height="2px"
+                        sx={{
+                            bg: 'black',
+                            '& > div': {
+                                bg: 'white',
+                            },
+                        }}
+                    />
+                </Box>
+                <Box height="20px" />
+
+                <Text align="center" color='white'>{reviewWordsCount} / {progressBar}</Text> {/* Display progress info */}
+
+                <Box height="40px" />
+                <Button variant='primary' width="100%" onClick={() => navigate({ to: '/main' })}>Назад в меню</Button>
             </AbsoluteCenter>
-
-
         </BackgroundBox>
     )
 }
