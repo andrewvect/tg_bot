@@ -6,6 +6,7 @@ import { SettingsService } from '../client/sdk.gen'
 import type {
     SettingsGetUserSettingsResponse,
 } from '../client/types.gen'
+import Loading from '../components/Common/Loading' // Import the Loading component
 
 export const Route = createFileRoute('/settings')({
     component: NewWord,
@@ -13,25 +14,24 @@ export const Route = createFileRoute('/settings')({
 
 function NewWord() {
     const navigate = useNavigate()
-    const [displaySetting, setDisplaySetting] = useState('1') // Default value
+    const [displaySetting, setDisplaySetting] = useState('4') // Default value
+    const [loading, setLoading] = useState(true) // New loading state
 
     useEffect(() => {
-        async function fetchSettings() {
-            try {
-                const token = localStorage.getItem('token')
-                if (!token) {
-                    console.error('No token found')
-                    return
-                }
-                const res: SettingsGetUserSettingsResponse = await SettingsService.getUserSettings({
-                    authorization: `Bearer ${token}`,
-                })
-                setDisplaySetting(String(res.spoiler_settings))
-            } catch (err) {
-                console.error(err)
-            }
+        const token = localStorage.getItem('token')
+        if (!token) {
+            console.error('No token found')
+            setLoading(false) // Stop loading if no token
+            return;
         }
-        fetchSettings()
+        SettingsService.getUserSettings({
+            authorization: `Bearer ${token}`,
+        })
+            .then((res: SettingsGetUserSettingsResponse) => {
+                setDisplaySetting(String(res.spoiler_settings))
+            })
+            .catch(err => console.error(err))
+            .finally(() => setLoading(false)) // Set loading to false after fetching
     }, [])
 
     const handleChange = async (value: string) => {
@@ -53,11 +53,15 @@ function NewWord() {
         }
     }
 
+    if (loading) {
+        return <Loading /> // Render the Loading component while loading
+    }
+
     return (
         <BackgroundBox>
             <AbsoluteCenter>
                 <VStack align="stretch" spacing={4} width="300px" p={4}>
-                    <Text fontSize="5xl" fontWeight="bold" color="white">Настройки</Text>
+                    <Text fontSize="4xl" fontWeight="bold" color="white">Настройки</Text>
                     <List spacing={6}>
                         <ListItem>
                             <Stack mt={2}>
