@@ -35,6 +35,10 @@ class WordCardHandler:
         if word_id in self.cache[telegram_id].created_cards:
             raise ValueError("Word card already created")
 
+        if word_id != 1 and len(self.cache[telegram_id].created_cards) == 0:
+            if word_id != self.cache[telegram_id].created_cards[-1] + 1:
+                raise ValueError("Word card not in sequence")
+
         if known is True:
             count_of_views = 20
             self.cache[telegram_id].known_cards.add(word_id)
