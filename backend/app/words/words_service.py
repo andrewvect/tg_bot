@@ -99,11 +99,14 @@ class WordCardHandler:
 
     def get_review_words_count(self, user_id: int) -> int:
         """Get count of words for review"""
+        self._refresh_user_reviews(user_id)
+
         return len(self.cache[user_id].review_cards)
 
     def _refresh_user_reviews(self, user_id):
+        current_time = int(datetime.datetime.now().timestamp())
         for date_review, word_id in self.cache[user_id].waiting_cards.items():
-            if date_review < int(datetime.datetime.now().timestamp()):
+            if date_review < current_time:
                 self.cache[user_id].review_cards.append(word_id)
                 del self.cache[user_id].waiting_cards[date_review]
             else:
