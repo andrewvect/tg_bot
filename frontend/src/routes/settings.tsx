@@ -57,28 +57,30 @@ function NewWord() {
         <BackgroundBox>
             <AbsoluteCenter>
                 <VStack align="stretch" spacing={4} width="300px" p={4}>
-                    <Text fontSize="2xl" fontWeight="bold" color="white">Настройки</Text>
+                    <Text fontSize="5xl" fontWeight="bold" color="white">Настройки</Text>
                     <List spacing={6}>
                         <ListItem>
                             <Stack mt={2}>
-                                <Text color="white">Показывать первым</Text>
+                                <Text fontSize="3xl" fontWeight="bold" color="white">Показывать первым</Text>
                                 <RadioGroup value={displaySetting} onChange={handleChange}>
                                     <Stack direction="column">
                                         <Radio value="2" colorScheme="whiteAlpha">
-                                            <Text color="white">Сербское</Text>
+                                            <Text fontSize="2xl" color="white">Сербское</Text>
                                         </Radio>
                                         <Radio value="1" colorScheme="whiteAlpha">
-                                            <Text color="white">Русское</Text>
+                                            <Text fontSize="2xl" color="white">Русское</Text>
                                         </Radio>
                                         <Radio value="3" colorScheme="whiteAlpha">
-                                            <Text color="white">Рандомное</Text>
+                                            <Text fontSize="2xl" color="white">Рандомное</Text>
                                         </Radio>
                                     </Stack>
                                 </RadioGroup>
                             </Stack>
                         </ListItem>
                     </List>
-                    <Button width="100%" onClick={() => navigate({ to: '/main' })}>Назад</Button>
+                    <Button variant='primary' width="100%" mt={4} onClick={() => navigate({ to: '/main' })}>
+                        Назад
+                    </Button>
                 </VStack>
             </AbsoluteCenter>
         </BackgroundBox>
