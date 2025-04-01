@@ -181,7 +181,15 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
             <AbsoluteCenter>
                 <CardComponent header={displayWord}>
                     {showTranslation[currentWord.word_id] && (
-                        <Text fontSize={'5xl'} color="white">
+                        <Text
+                            fontSize={'5xl'}
+                            color="white"
+                            textAlign="center"
+                            height="80px" // Set a consistent height
+                            display="flex"
+                            alignItems="center" // Center text vertically
+                            justifyContent="center" // Center text horizontally
+                        >
                             {displayTranslation}
                         </Text>
                     )}
@@ -196,7 +204,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                         <ViewIcon />
                     </Button>
                 </CardComponent>
-                <VStack spacing={1} width="300px" mt="5px">
+                <VStack spacing={1} width="300px" mt="5px" align="center">
                     <Stack direction='row' width="100%">
                         <Button variant='primary' width="50%" onClick={() => handleReview(true)} isDisabled={isProcessing}>
                             <CheckIcon boxSize="6" strokeWidth="2px" />
@@ -205,8 +213,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                             <CloseIcon boxSize="6" strokeWidth="2px" />
                         </Button>
                     </Stack>
-                </VStack>
-                <Box height="40px" />
+                    <Box height="40px" />
                 <Box width="300px" mt="10px"> {/* Move Progress outside VStack */}
                     <Progress
                         value={reviewWordsCount}
@@ -226,6 +233,9 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
 
                 <Box height="40px" />
                 <Button variant='primary' width="100%" onClick={() => navigate({ to: '/main' })}>Назад в меню</Button>
+                </VStack>
+
+
             </AbsoluteCenter>
         </BackgroundBox>
     )

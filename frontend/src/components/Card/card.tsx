@@ -13,7 +13,7 @@ export function CardComponent({ header, children }: CardComponentProps) {
                     <VStack>
                         <CardHeader width={"100%"}>
                             <Text
-                                fontSize={["4xl", "3xl", "4xl", "5xl", "6xl", "7xl"]} // Reduce font size
+                                fontSize={["6xl", "7xl"]} // Reduce font size
                                 fontWeight="bold"
                                 color="white"
                                 isTruncated={false} // Disable truncation
@@ -24,7 +24,16 @@ export function CardComponent({ header, children }: CardComponentProps) {
                                 {header}
                             </Text>
                         </CardHeader>
-                        <Text p="6" textAlign="center">
+                        <Text
+                            p="6"
+                            textAlign="center"
+                            fontSize={["4xl", "5xl"]}
+                            color="white"
+                            height="80px" // Set a fixed height to prevent layout shifts
+                            display="flex"
+                            alignItems="center" // Center text vertically
+                            justifyContent="center" // Center text horizontally
+                        >
                             {children}
                         </Text>
                     </VStack>
