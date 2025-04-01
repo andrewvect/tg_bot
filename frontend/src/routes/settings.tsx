@@ -61,7 +61,16 @@ function NewWord() {
         <BackgroundBox>
             <AbsoluteCenter>
                 <VStack align="stretch" spacing={4} width="300px" p={4}>
-                    <Text fontSize="4xl" fontWeight="bold" color="white">Настройки</Text>
+                    <Text
+                        fontSize="4xl"
+                        fontWeight="bold"
+                        color="white"
+                        isTruncated
+                        noOfLines={1}
+                        textOverflow="ellipsis"
+                    >
+                        Настройки
+                    </Text>
                     <List spacing={6}>
                         <ListItem>
                             <Stack mt={2}>
