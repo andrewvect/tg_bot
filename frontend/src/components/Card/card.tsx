@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Text, Center, VStack } from "@chakra-ui/react"
+import { Card, CardBody, CardHeader, Text, Center, VStack } from "@chakra-ui/react";
 
 interface CardComponentProps {
     header: string;
@@ -11,25 +11,25 @@ export function CardComponent({ header, children }: CardComponentProps) {
             <CardBody gap="2">
                 <Center>
                     <VStack>
-                        <CardHeader>
+                        <CardHeader width={"100%"}>
                             <Text
-                                fontSize="7xl"
+                                fontSize={["4xl", "3xl", "4xl", "5xl", "6xl", "7xl"]} // Reduce font size
                                 fontWeight="bold"
                                 color="white"
-                                isTruncated
-                                noOfLines={1}
-                                wordBreak="break-word"
+                                isTruncated={false} // Disable truncation
+                                whiteSpace="normal" // Allow text to wrap to the next line
                                 textAlign="center"
+                                maxWidth="100%" // Constrain the text width
                             >
                                 {header}
                             </Text>
                         </CardHeader>
-                        <Text textAlign="center">
+                        <Text p="6" textAlign="center">
                             {children}
                         </Text>
                     </VStack>
                 </Center>
             </CardBody>
         </Card>
-    )
+    );
 }
