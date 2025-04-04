@@ -179,6 +179,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
     return (
         <BackgroundBox>
             <AbsoluteCenter>
+                <VStack  alignItems={"center"} justifyContent="center">
                 <CardComponent header={displayWord}>
                     {showTranslation[currentWord.word_id] && (
                         <Text>
@@ -205,7 +206,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                             <CloseIcon boxSize="6" strokeWidth="2px" />
                         </Button>
                     </Stack>
-                    <Box height="40px" />
+                    <Box height="5vh" />
                 <Box width="300px" mt="10px"> {/* Move Progress outside VStack */}
                     <Progress
                         value={reviewWordsCount}
@@ -219,13 +220,15 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                         }}
                     />
                 </Box>
-                <Box height="20px" />
+                <Box height="0.5vh" />
 
                 <Text align="center" color='white'>{reviewWordsCount} / {progressBar}</Text> {/* Display progress info */}
 
-                <Box height="40px" />
+                <Box height="1.5vh" />
                 <Button variant='primary' width="100%" onClick={() => navigate({ to: '/main' })}>Назад в меню</Button>
                 </VStack>
+                </VStack>
+
 
 
             </AbsoluteCenter>
