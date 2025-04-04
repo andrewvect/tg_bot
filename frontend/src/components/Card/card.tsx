@@ -14,10 +14,10 @@ export function CardComponent({ header, children }: CardComponentProps) {
         <Card backgroundColor="black">
             <CardBody gap={0} padding={0} width="100%">
                 <Center>
-                    <VStack width="100%" height="100%">
+                    <VStack width="100%" height="100%" alignItems={"center"} justifyContent="center">
                         <CardHeader gap={0} padding={0} width="100%">
                             <Text
-                                fontSize={`clamp(1px, calc(80vw / ${headerLength}), 70px)`}
+                                fontSize={`clamp(1px, calc(130vw / ${headerLength}), 70px)`}
                                 fontWeight="bold"
                                 color="white"
                                 isTruncated={false}
@@ -34,7 +34,7 @@ export function CardComponent({ header, children }: CardComponentProps) {
                         </CardHeader>
                         <Text
                             textAlign="center"
-                            fontSize={`clamp(1px, calc(60vw / ${childrenLength}), 60px)`}// Adjusts font size based on header length
+                            fontSize={`clamp(1px, calc(130vw / ${childrenLength}), 60px)`}// Adjusts font size based on header length
                             color="white"
                             height="80px" // Set a fixed height to prevent layout shifts
                             display="flex"
