@@ -181,15 +181,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
             <AbsoluteCenter>
                 <CardComponent header={displayWord}>
                     {showTranslation[currentWord.word_id] && (
-                        <Text
-                            fontSize={'5xl'}
-                            color="white"
-                            textAlign="center"
-                            height="80px" // Set a consistent height
-                            display="flex"
-                            alignItems="center" // Center text vertically
-                            justifyContent="center" // Center text horizontally
-                        >
+                        <Text>
                             {displayTranslation}
                         </Text>
                     )}
