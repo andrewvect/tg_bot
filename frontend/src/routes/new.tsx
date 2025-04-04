@@ -145,7 +145,7 @@ function NewWord() {
     return (
         <BackgroundBox>
             <AbsoluteCenter>
-                <VStack>
+                <VStack  alignItems={"center"} justifyContent="center">
                 <CardComponent header={currentWord?.translation ?? ''}>
 
                     {currentWord?.word ?? ''}
@@ -157,6 +157,7 @@ function NewWord() {
                         <Button variant='primary' width="50%" onClick={handleAddCard}>Добавить</Button>
                         <Button variant='primary' width="50%" onClick={handleSkipCard}>Уже знаю</Button>
                     </Stack>
+                    <Box height="1.5wh" />
                     <Button
                         variant='primary'
                         width="100%"
