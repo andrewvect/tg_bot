@@ -1,5 +1,5 @@
 import { Card, CardBody, CardHeader, Text, Center, VStack } from "@chakra-ui/react";
-import { React } from "react";
+import React from "react";
 
 interface CardComponentProps {
     header: string;
@@ -8,7 +8,7 @@ interface CardComponentProps {
 
 export function CardComponent({ header, children }: CardComponentProps) {
     const headerLength = header.length;
-    const childrenLength = children.toString().length;
+    const childrenLength = (children ? children.toString() : "").length;
 
     return (
         <Card backgroundColor="black">
