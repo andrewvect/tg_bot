@@ -181,21 +181,16 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
             <AbsoluteCenter>
                 <VStack  alignItems={"center"} justifyContent="center">
                 <CardComponent header={displayWord}>
-                    {showTranslation[currentWord.word_id] && (
-                        <Text>
-                            {displayTranslation}
-                        </Text>
-                    )}
+                    {showTranslation[currentWord.word_id] ? displayTranslation :
                     <Button
                         onClick={() => {
                             setShowTranslation(prev => ({ ...prev, [currentWord.word_id]: true }));
                             setFlipped(true); // Ensure flipped is toggled correctly
                         }}
-                        hidden={showTranslation[currentWord.word_id]}
                         isDisabled={isProcessing}
                     >
                         <ViewIcon />
-                    </Button>
+                    </Button>}
                 </CardComponent>
                 <VStack spacing={1} width="300px" mt="5px" align="center">
                     <Stack direction='row' width="100%">
@@ -228,9 +223,6 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                 <Button variant='primary' width="100%" onClick={() => navigate({ to: '/main' })}>Назад в меню</Button>
                 </VStack>
                 </VStack>
-
-
-
             </AbsoluteCenter>
         </BackgroundBox>
     )

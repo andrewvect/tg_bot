@@ -3,12 +3,12 @@ import React from "react";
 
 interface CardComponentProps {
     header: string;
-    children: React.ReactNode;
+    children: React.ReactNode | string;
 }
 
 export function CardComponent({ header, children }: CardComponentProps) {
     const headerLength = header.length;
-    const childrenLength = (children ? children.toString() : "").length;
+    const childrenLength = (typeof children === 'string' ? children.length : (children ? children.toString() : "").length);
 
     return (
         <Card backgroundColor="black">
