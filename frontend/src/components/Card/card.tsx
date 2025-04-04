@@ -1,4 +1,5 @@
 import { Card, CardBody, CardHeader, Text, Center, VStack } from "@chakra-ui/react";
+import { React } from "react";
 
 interface CardComponentProps {
     header: string;
@@ -6,7 +7,8 @@ interface CardComponentProps {
 }
 
 export function CardComponent({ header, children }: CardComponentProps) {
-
+    const headerLength = header.length;
+    const childrenLength = children.toString().length;
 
     return (
         <Card backgroundColor="black">
@@ -15,7 +17,7 @@ export function CardComponent({ header, children }: CardComponentProps) {
                     <VStack width="100%" height="100%">
                         <CardHeader gap={0} padding={0} width="100%">
                             <Text
-                                fontSize="clamp(16px, 15vw, 200px)" // Adjusts font size based on header length
+                                fontSize={`clamp(35px, calc(80vw / ${headerLength}), 70px)`}
                                 fontWeight="bold"
                                 color="white"
                                 isTruncated={false}
@@ -32,7 +34,7 @@ export function CardComponent({ header, children }: CardComponentProps) {
                         </CardHeader>
                         <Text
                             textAlign="center"
-                            fontSize="clamp(16px, 10vw, 200px)" // Adjusts font size based on header length
+                            fontSize={`clamp(30px, calc(60vw / ${childrenLength}), 60px)`}// Adjusts font size based on header length
                             color="white"
                             height="80px" // Set a fixed height to prevent layout shifts
                             display="flex"
@@ -41,7 +43,6 @@ export function CardComponent({ header, children }: CardComponentProps) {
                         >
                             {children}
                         </Text>
-
                     </VStack>
                 </Center>
             </CardBody>
