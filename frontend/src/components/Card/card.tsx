@@ -6,28 +6,33 @@ interface CardComponentProps {
 }
 
 export function CardComponent({ header, children }: CardComponentProps) {
+
+
     return (
-        <Card width="300px" backgroundColor="black" padding="4">
-            <CardBody gap="2">
+        <Card backgroundColor="black">
+            <CardBody gap={0} padding={0} width="100%">
                 <Center>
-                    <VStack>
-                        <CardHeader width={"100%"}>
+                    <VStack width="100%" height="100%">
+                        <CardHeader gap={0} padding={0} width="100%">
                             <Text
-                                fontSize={["6xl", "7xl"]} // Reduce font size
+                                fontSize="clamp(16px, 15vw, 200px)" // Adjusts font size based on header length
                                 fontWeight="bold"
                                 color="white"
-                                isTruncated={false} // Disable truncation
-                                whiteSpace="normal" // Allow text to wrap to the next line
+                                isTruncated={false}
+                                whiteSpace="nowrap"
+                                textOverflow="ellipsis"
+                                overflow="hidden"
+                                width="100%" // Take full width of parent
                                 textAlign="center"
-                                maxWidth="100%" // Constrain the text width
+                                display="flex"
+                                justifyContent="center" // Center content horizontally
                             >
                                 {header}
                             </Text>
                         </CardHeader>
                         <Text
-                            p="6"
                             textAlign="center"
-                            fontSize={["4xl", "5xl"]}
+                            fontSize="clamp(16px, 10vw, 200px)" // Adjusts font size based on header length
                             color="white"
                             height="80px" // Set a fixed height to prevent layout shifts
                             display="flex"
@@ -36,6 +41,7 @@ export function CardComponent({ header, children }: CardComponentProps) {
                         >
                             {children}
                         </Text>
+
                     </VStack>
                 </Center>
             </CardBody>
