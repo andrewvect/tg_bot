@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Header, HTTPException
 
 from app.api.deps import SettingsRepoDep, TokensServiceDep
-from app.schemas.settings import SetSettingsRequest, SettingsResponse
+from app.schemas.settings import SettingsResponse, SettingsUpdateRequest
 from app.utils.logger import logger
 
 router = APIRouter(prefix="/settings", tags=["settings"])
@@ -20,7 +20,9 @@ async def get_user_settings(
             condition=settings_repo.type_model.user_id == user_id
         )
         return SettingsResponse(
-            spoiler_settings=user.spoiler_settings, user_id=user.user_id
+            spoiler_settings=user.spoiler_settings,
+            user_id=user.user_id,
+            alphabet_settings=user.alphabet_settings,
         )
     except Exception as e:
         logger.error("Error while getting user settings: %s", e)
@@ -31,7 +33,7 @@ async def get_user_settings(
 async def set_user_settings(
     settings_repo: SettingsRepoDep,
     tokens_service: TokensServiceDep,
-    request: SetSettingsRequest,
+    request: SettingsUpdateRequest,
     authorization: str = Header(None),
 ):
     """Set user settings"""
@@ -41,10 +43,12 @@ async def set_user_settings(
             condition=settings_repo.type_model.user_id == user_id
         )
         current_settings.spoiler_settings = request.spoiler_settings
+        current_settings.alphabet_settings = request.alphabet_settings
         user_settings = await settings_repo.update(current_settings)
         return SettingsResponse(
             spoiler_settings=user_settings.spoiler_settings,
             user_id=user_settings.user_id,
+            alphabet_settings=user_settings.alphabet_settings,
         )
     except Exception as e:
         logger.error("Error while setting user settings: %s", e)
