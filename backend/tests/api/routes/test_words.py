@@ -203,3 +203,24 @@ async def test_get_review_words(
 
     assert response.status_code == 200
     assert len(response.json()["words"]) == len(db_with_cards)
+
+
+@pytest.mark.asyncio
+async def test_legend_field_in_response(
+    client,
+    test_user,  # noqa
+    db_with_words,  # noqa
+    db_session,  # noqa
+    set_up_cache,  # noqa
+    mock_tokens_service,  # noqa
+):
+    """Test legend field in new word"""
+
+    response = await client.get(
+        "api/v1/cards/", headers={"Authorization": "Bearer some_token"}
+    )
+
+    assert response.status_code == 200
+    # check legend field
+    assert response.json()["words"][0]["legend"] is not None
+    assert response.json()["words"][0]["legend"] == db_with_words[0].legend
