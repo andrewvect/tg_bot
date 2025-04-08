@@ -9,6 +9,7 @@ import { WordsResponse } from '../client/types.gen'
 import {useState, useEffect} from 'react'
 import AllWordsReviewed from '../components/AllWordsReviewed'
 import Loading from '../components/Common/Loading' // added Loading import
+import { Legend } from '../components/Card/legend'
 
 export const Route = createFileRoute('/review')({
     component: ReviewPage,
@@ -180,12 +181,15 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
         <BackgroundBox>
             <AbsoluteCenter>
                 <VStack  alignItems={"center"} justifyContent="center">
+                <Box>
+                    <Legend legend={currentWord?.legend ?? ''} />
+                </Box>
                 <CardComponent header={displayWord}>
                     {showTranslation[currentWord.word_id] ? displayTranslation :
                     <Button
                         onClick={() => {
                             setShowTranslation(prev => ({ ...prev, [currentWord.word_id]: true }));
-                            setFlipped(true); // Ensure flipped is toggled correctly
+                            setFlipped(true);
                         }}
                         isDisabled={isProcessing}
                     >

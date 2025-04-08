@@ -58,11 +58,14 @@ export type WordResponse = {
   word_id: number
   word: string
   translation: string
+  legend?: string | null
 }
 
 export type WordsResponse = {
   words: Array<WordResponse>
 }
+
+export type HealthCheckHealthCheckResponse = unknown
 
 export type LoginLoginAccessTokenData = {
   requestBody: RequestInitData

@@ -4,6 +4,7 @@ import type { CancelablePromise } from "./core/CancelablePromise"
 import { OpenAPI } from "./core/OpenAPI"
 import { request as __request } from "./core/request"
 import type {
+  HealthCheckHealthCheckResponse,
   LoginLoginAccessTokenData,
   LoginLoginAccessTokenResponse,
   SettingsGetUserSettingsData,
@@ -24,10 +25,24 @@ import type {
   WebhookWebhook1Response,
 } from "./types.gen"
 
+export class HealthCheckService {
+  /**
+   * Health Check
+   * Health check endpoint.
+   * @returns unknown Successful Response
+   * @throws ApiError
+   */
+  public static healthCheck(): CancelablePromise<HealthCheckHealthCheckResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/utils/health-check/",
+    })
+  }
+}
+
 export class LoginService {
   /**
    * Login Access Token
-   * OAuth2 compatible token login, get an access token for future requests
    * @param data The data for the request.
    * @param data.requestBody
    * @returns ResponceToken Successful Response

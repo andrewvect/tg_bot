@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Button, Text, VStack, Stack, Box } from "@chakra-ui/react"
+import { Button, Text, VStack, Stack, Box, Circle, Center } from "@chakra-ui/react"
 import BackgroundBox from '../components/back'
 import { CardComponent } from '../components/Card/card'
 import { UtilsService } from '../client/sdk.gen'
@@ -7,6 +7,7 @@ import { WordResponse } from '../client/types.gen'
 import { useState, useEffect } from "react"
 import Loading from '../components/Common/Loading' // added Loading import
 import { AbsoluteCenter } from "@chakra-ui/react"
+import { Legend } from '../components/Card/legend'
 
 export const Route = createFileRoute('/new')({
     component: NewWord,
@@ -146,11 +147,12 @@ function NewWord() {
         <BackgroundBox>
             <AbsoluteCenter>
                 <VStack  alignItems={"center"} justifyContent="center">
-                <CardComponent header={currentWord?.translation ?? ''}>
-
-                    {currentWord?.word ?? ''}
-
-                </CardComponent>
+                <Box>
+                    <Legend legend={currentWord?.legend ?? ''} />
+                    <CardComponent header={currentWord?.translation ?? ''}>
+                        {currentWord?.word ?? ''}
+                    </CardComponent>
+                </Box>
                 <Box height="40px" />
                 <VStack spacing={1} width="300px" mt="5px" align="center">
                     <Stack direction='row' width="100%">
