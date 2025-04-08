@@ -23,6 +23,7 @@ async def test_get_user_settings(
     assert response.json() == {
         "spoiler_settings": test_user_settings.spoiler_settings,
         "user_id": test_user.telegram_id,
+        "alphabet_settings": test_user_settings.alphabet_settings,
     }
 
 
@@ -37,11 +38,15 @@ async def test_set_user_settings(
     responce = await client.put(
         "/api/v1/settings/",
         headers={"Authorization": "Bearer some_token"},
-        json={"spoiler_settings": 2},
+        json={"spoiler_settings": 2, "alphabet_settings": 2},
     )
 
     assert responce.status_code == 200
-    assert responce.json() == {"user_id": test_user.telegram_id, "spoiler_settings": 2}
+    assert responce.json() == {
+        "user_id": test_user.telegram_id,
+        "spoiler_settings": 2,
+        "alphabet_settings": 2,
+    }
     # check db
     db_session.refresh(test_user_settings)
     settings = db_session.execute(
@@ -49,3 +54,4 @@ async def test_set_user_settings(
     )
     user_settings = settings.scalars().first()
     assert user_settings.spoiler_settings == 2
+    assert user_settings.alphabet_settings == 2
