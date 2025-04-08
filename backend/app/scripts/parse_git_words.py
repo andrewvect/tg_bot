@@ -61,9 +61,11 @@ class GitWordParser:
                         existing_word.native_word != item["translation"]
                         or existing_word.cyrillic_word
                         != item["serbian_word"]["Cyrillic"]
+                        or existing_word.legend != item["bio"]
                     ):
                         existing_word.native_word = item["translation"]
                         existing_word.cyrillic_word = item["serbian_word"]["Cyrillic"]
+                        existing_word.legend = item["bio"]
                         session.commit()
                         count += 1
                 except SQLAlchemyError as e:
