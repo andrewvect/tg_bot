@@ -16,6 +16,7 @@ class WordResponse(BaseModel):
     word_id: int
     word: str
     translation: str
+    legend: str | None = None
 
 
 class WordsResponse(BaseModel):
