@@ -55,7 +55,10 @@ async def get_new_word(
         )
         word_responses = [
             WordResponse(
-                word_id=word.id, word=word.native_word, translation=word.foreign_word
+                word_id=word.id,
+                word=word.native_word,
+                translation=word.foreign_word,
+                legend=word.legend,
             )
             for word in words
         ]
