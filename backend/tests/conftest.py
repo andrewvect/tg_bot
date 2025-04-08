@@ -144,7 +144,9 @@ def db_with_words(request, db_session) -> list[Word]:
     words = []
     for _ in range(count):
         word = Word(
-            foreign_word=faker.unique.word(), native_word=ru_faker.unique.word()
+            foreign_word=faker.unique.word(),
+            native_word=ru_faker.unique.word(),
+            legend=faker.sentence(),
         )
         db_session.add(word)
         words.append(word)
