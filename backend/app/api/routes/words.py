@@ -105,7 +105,10 @@ async def get_review_words(
         )
         words = [
             WordResponse(
-                word_id=word.id, word=word.native_word, translation=word.foreign_word
+                word_id=word.id,
+                word=word.native_word,
+                translation=word.foreign_word,
+                legend=word.legend,
             )
             for word in words
         ]
