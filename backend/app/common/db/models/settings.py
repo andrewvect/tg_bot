@@ -10,12 +10,16 @@ class Settings(Base):
     Settings model representing user-specific settings in the system.
     """
 
-    spoiler_settings: Mapped[int] = mapped_column(
+    alphabet_settings: Mapped[int] = mapped_column(
         sa.Integer,
         nullable=False,
-        default=1,
+        default=3,
     )
-    """ User's spoiler setting (enabled=1, disabled=0) """
+    """ User's alphabet setting (use_two_alphabets=1, cyrilic_only=2, latin_only=3) """
+
+    _alphabet_constraint = CheckConstraint(
+        "alphabet_settings IN (1,2,3)", name="check_alphabet_settings"
+    )
 
     user_id: Mapped[int] = mapped_column(
         ForeignKey("user.telegram_id"),
@@ -26,6 +30,12 @@ class Settings(Base):
     )
     """ Foreign key to User's telegram_id """
 
+    spoiler_settings: Mapped[int] = mapped_column(
+        sa.Integer,
+        nullable=False,
+        default=1,
+    )
+
     # Constrains
     __table_args__ = (
         CheckConstraint(
@@ -33,7 +43,6 @@ class Settings(Base):
         ),
     )
     """ Ensure spoiler_settings"""
-
     # Relationships
     user: Mapped["User"] = relationship(  # noqa
         "User",
