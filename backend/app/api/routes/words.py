@@ -56,8 +56,9 @@ async def get_new_word(
         word_responses = [
             WordResponse(
                 word_id=word.id,
-                word=word.native_word,
-                translation=word.foreign_word,
+                latin_word=word.latin_word,
+                cyrillic_word=word.cyrillic_word,
+                native_word=word.native_word,
                 legend=word.legend,
             )
             for word in words
@@ -106,8 +107,9 @@ async def get_review_words(
         words = [
             WordResponse(
                 word_id=word.id,
-                word=word.native_word,
-                translation=word.foreign_word,
+                latin_word=word.latin_word,
+                cyrillic_word=word.cyrillic_word,
+                native_word=word.native_word,
                 legend=word.legend,
             )
             for word in words
