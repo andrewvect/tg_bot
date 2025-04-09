@@ -36,16 +36,21 @@ export type ReviewResponse = {
   message: string
 }
 
-export type SetSettingsRequest = {
+export type SettingsResponse = {
+  spoiler_settings: number
+  user_id: number
+  alphabet_settings: number
+}
+
+export type SettingsUpdateRequest = {
   /**
    * Must be 1, 2, or 3
    */
   spoiler_settings: number
-}
-
-export type SettingsResponse = {
-  spoiler_settings: number
-  user_id: number
+  /**
+   * Must be 1, 2, or 3
+   */
+  alphabet_settings: number
 }
 
 export type ValidationError = {
@@ -56,8 +61,9 @@ export type ValidationError = {
 
 export type WordResponse = {
   word_id: number
-  word: string
-  translation: string
+  latin_word: string
+  cyrillic_word: string
+  native_word: string
   legend?: string | null
 }
 
@@ -81,7 +87,7 @@ export type SettingsGetUserSettingsResponse = SettingsResponse
 
 export type SettingsSetUserSettingsData = {
   authorization?: string
-  requestBody: SetSettingsRequest
+  requestBody: SettingsUpdateRequest
 }
 
 export type SettingsSetUserSettingsResponse = SettingsResponse
