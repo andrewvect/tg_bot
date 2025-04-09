@@ -15,6 +15,7 @@ export const Route = createFileRoute('/settings')({
 function NewWord() {
     const navigate = useNavigate()
     const [displaySetting, setDisplaySetting] = useState('4') // Default value
+    const [alphabetSetting, setAlphabetSetting] = useState('4') // Default value
     const [loading, setLoading] = useState(true) // New loading state
 
     useEffect(() => {
@@ -29,27 +30,32 @@ function NewWord() {
         })
             .then((res: SettingsGetUserSettingsResponse) => {
                 setDisplaySetting(String(res.spoiler_settings))
+                setAlphabetSetting(String(res.alphabet_settings))
             })
             .catch(err => console.error(err))
             .finally(() => setLoading(false)) // Set loading to false after fetching
     }, [])
 
-    const handleChange = async (value: string) => {
-        setDisplaySetting(value)
+    const handleChange = async (spoilerSettingValue?: string, alphabetSettingsValue?: string) => {
+        const newDisplay = spoilerSettingValue !== undefined ? spoilerSettingValue : displaySetting;
+        const newAlphabet = alphabetSettingsValue !== undefined ? alphabetSettingsValue : alphabetSetting;
+        setDisplaySetting(newDisplay);
+        setAlphabetSetting(newAlphabet);
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('token');
             if (!token) {
-                console.error('No token found')
-                return
+                console.error('No token found');
+                return;
             }
             await SettingsService.setUserSettings({
                 authorization: `Bearer ${token}`,
                 requestBody: {
-                    spoiler_settings: Number(value)
+                    spoiler_settings: Number(newDisplay),
+                    alphabet_settings: Number(newAlphabet),
                 }
-            })
+            });
         } catch (err) {
-            console.error(err)
+            console.error(err);
         }
     }
 
@@ -75,7 +81,7 @@ function NewWord() {
                         <ListItem>
                             <Stack mt={2}>
                                 <Text fontSize="3xl" fontWeight="bold" color="white">Показывать первым</Text>
-                                <RadioGroup value={displaySetting} onChange={handleChange}>
+                                <RadioGroup value={displaySetting} onChange={(value) => handleChange(value, undefined)}>
                                     <Stack direction="column">
                                         <Radio value="2" colorScheme="whiteAlpha">
                                             <Text fontSize="2xl" color="white">Сербское</Text>
@@ -85,6 +91,20 @@ function NewWord() {
                                         </Radio>
                                         <Radio value="3" colorScheme="whiteAlpha">
                                             <Text fontSize="2xl" color="white">Рандомное</Text>
+                                        </Radio>
+                                    </Stack>
+                                </RadioGroup>
+                                <Text fontSize="3xl" fontWeight="bold" color="white">Алфавит</Text>
+                                <RadioGroup value={alphabetSetting} onChange={(value) => handleChange(undefined, value)}>
+                                    <Stack direction="column">
+                                        <Radio value="3" colorScheme="whiteAlpha">
+                                            <Text fontSize="2xl" color="white">Латинский</Text>
+                                        </Radio>
+                                        <Radio value="2" colorScheme="whiteAlpha">
+                                            <Text fontSize="2xl" color="white">Крилический</Text>
+                                        </Radio>
+                                        <Radio value="1" colorScheme="whiteAlpha">
+                                            <Text fontSize="2xl" color="white">Оба</Text>
                                         </Radio>
                                     </Stack>
                                 </RadioGroup>
