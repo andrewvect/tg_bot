@@ -149,8 +149,8 @@ function NewWord() {
                 <VStack  alignItems={"center"} justifyContent="center">
                 <Box>
                     <Legend legend={currentWord?.legend ?? ''} />
-                    <CardComponent header={currentWord?.translation ?? ''}>
-                        {currentWord?.word ?? ''}
+                    <CardComponent header={`${currentWord?.cyrillic_word ?? ''}/${currentWord?.latin_word ?? ''}`}>
+                        {currentWord?.native_word ?? ''}
                     </CardComponent>
                 </Box>
                 <Box height="40px" />
