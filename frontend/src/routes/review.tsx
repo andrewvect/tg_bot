@@ -70,7 +70,7 @@ function ReviewPage() {
     const [isLoading, setLoading] = useState(true)
     const [refreshKey, setRefreshKey] = useState(0)
     const [progresBar, setProgresBar] = useState(0)
-    const [userSettings, setUserSettings] = useState<{ spoiler_settings: number } | null>(null)
+    const [userSettings, setUserSettings] = useState<{ spoiler_settings: number, alphabet_settings: number } | null>(null)
 
     useEffect(() => {
         fetchUserSettings().then((settings) => {
@@ -93,12 +93,15 @@ function ReviewPage() {
         return <AllWordsReviewed />;
     }
 
-    return <ReviewWords key={refreshKey}
+    return <ReviewWords
+    key={refreshKey}
     reviewWordsCount={reviewWordsCount}
     setLoading={setLoading}
     setCount={setCount}
     setRefreshKey={setRefreshKey}
-    progressBar={progresBar} spoilerSettings={userSettings?.spoiler_settings?? 0} />;
+    progressBar={progresBar}
+    spoilerSettings={userSettings?.spoiler_settings?? 0}
+    alphabetSettings={userSettings?.alphabet_settings?? 0} />;
 }
 
 
@@ -108,10 +111,11 @@ interface ReviewWordsProps {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     setRefreshKey: React.Dispatch<React.SetStateAction<number>>;
     spoilerSettings: number;
+    alphabetSettings: number;
     progressBar: number;
 }
 
-function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, progressBar, spoilerSettings }: ReviewWordsProps) {
+function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, progressBar, spoilerSettings , alphabetSettings}: ReviewWordsProps) {
     const navigate = useNavigate()
     const [words, setWords] = useState<WordsResponse['words']>([])
     const [showTranslation, setShowTranslation] = useState<{ [key: number]: boolean }>({})
@@ -130,25 +134,37 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
 
     useEffect(() => {
         if (currentWord) {
-            setDisplayWord(currentWord.word);
-            setDisplayTranslation(currentWord.translation);
-        }
-        if (flipped && currentWord) {
-            if (spoilerSettings === 2) {
-                setDisplayTranslation(currentWord.word);
-                setDisplayWord(currentWord.translation);
-            } else if (spoilerSettings === 3) {
-                const random = Math.random();
-                if (random < 0.5) {
-                    setDisplayTranslation(currentWord.word);
-                    setDisplayWord(currentWord.translation);
+            let originalWord;
+            if (alphabetSettings === 3) {
+                originalWord = currentWord.latin_word;
+            } else if (alphabetSettings === 2) {
+                originalWord = currentWord.cyrillic_word;
+            } else if (alphabetSettings === 1) {
+                originalWord = Math.random() < 0.5 ? currentWord.latin_word : currentWord.cyrillic_word;
+            }
+            let originalTranslation = currentWord.native_word;
+            if (flipped) {
+                if (spoilerSettings === 1) {
+                    setDisplayWord(originalTranslation);
+                    setDisplayTranslation(originalWord  ?? '');
+                } else if (spoilerSettings === 3) {
+                    if (Math.random() < 0.5) {
+                        setDisplayWord(originalTranslation);
+                        setDisplayTranslation(originalWord  ?? '');
+                    } else {
+                        setDisplayWord(originalWord ?? '');
+                        setDisplayTranslation(originalTranslation);
+                    }
                 } else {
-                    setDisplayWord(currentWord.word);
-                    setDisplayTranslation(currentWord.translation);
+                    setDisplayWord(originalWord  ?? '');
+                    setDisplayTranslation(originalTranslation);
                 }
+            } else {
+                setDisplayWord(originalWord  ?? '');
+                setDisplayTranslation(originalTranslation);
             }
         }
-    }, [flipped, currentWord, spoilerSettings]);
+    }, [currentWord, alphabetSettings, spoilerSettings, flipped]);
 
     const handleReview = (passed: boolean) => {
         if (isProcessing || !currentWord) return
