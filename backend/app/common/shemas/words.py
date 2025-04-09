@@ -14,8 +14,9 @@ class ReviewResponse(BaseModel):
 
 class WordResponse(BaseModel):
     word_id: int
-    word: str
-    translation: str
+    latin_word: str
+    cyrillic_word: str
+    native_word: str
     legend: str | None = None
 
 
