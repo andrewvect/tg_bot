@@ -13,7 +13,7 @@ class Word(Base):
     """Word model representing a word with translations, images, and related data."""
 
     # Fields
-    foreign_word: Mapped[str] = mapped_column(
+    latin_word: Mapped[str] = mapped_column(
         String(100), unique=True, nullable=False, index=True
     )
     """The foreign word (non-native language) Latin."""
@@ -48,7 +48,7 @@ class Word(Base):
     """Related card that includes this word."""
 
     def __str__(self):
-        return f"{self.foreign_word} ({self.native_word})"
+        return f"{self.latin_word} ({self.native_word})"
 
     def __repr__(self):
-        return f"<Word(id={self.id}, foreign_word={self.foreign_word}, native_word={self.native_word})>"
+        return f"<Word(id={self.id}, foreign_word={self.latin_word}, native_word={self.native_word})>"
