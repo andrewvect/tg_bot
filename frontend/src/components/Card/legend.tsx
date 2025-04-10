@@ -1,4 +1,4 @@
-import { Button, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody, Circle } from "@chakra-ui/react"
+import { Button, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverBody, Circle, Box } from "@chakra-ui/react"
 
 interface LegendProps {
 	legend: string
@@ -8,7 +8,8 @@ export const Legend = ({ legend }: LegendProps) => {
 	// If legend is null, do not show the element.
 	if (legend === null) return null;
 	return (
-		<Circle size="6" position="absolute" top="-2" right="-2">
+		<Box>
+		<Circle size="6" position="absolute" top="15vh" right="15vw">
 			<Popover>
 				<PopoverTrigger>
 					<Button size="2xl" fontSize="2xl" colorScheme="white">?</Button>
@@ -20,5 +21,6 @@ export const Legend = ({ legend }: LegendProps) => {
 				</PopoverContent>
 			</Popover>
 		</Circle>
+		</Box>
 	)
 }
