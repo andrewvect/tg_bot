@@ -11,7 +11,7 @@ export default function BackgroundBox({
 }) {
     return (
         <Center>
-            <Box w={["100%", "430px"]} minH={["100vh", "932px"]} bg={bg}>
+            <Box width={"100vw"} height="100vh" bg={bg}>
                 {children}
             </Box>
         </Center>
