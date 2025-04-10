@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Button, Text, AbsoluteCenter, VStack, Stack, Progress, Box } from "@chakra-ui/react"
+import { Button, Text, Center, VStack, Stack, Progress, Box, Container } from "@chakra-ui/react" // replaced AbsoluteCenter with Center
 
 import { ViewIcon, CheckIcon, CloseIcon } from "@chakra-ui/icons"
 import BackgroundBox from '../components/back'
@@ -10,6 +10,7 @@ import {useState, useEffect} from 'react'
 import AllWordsReviewed from '../components/AllWordsReviewed'
 import Loading from '../components/Common/Loading' // added Loading import
 import { Legend } from '../components/Card/legend'
+import { Flag } from '../components/Card/flag' // new import
 
 export const Route = createFileRoute('/review')({
     component: ReviewPage,
@@ -124,6 +125,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
     const [flipped, setFlipped] = useState(true)
     const [displayWord, setDisplayWord] = useState<string>('')
     const [displayTranslation, setDisplayTranslation] = useState<string>('')
+    const [flag, setFlag] = useState<string>('')
 
     useEffect(() => {
         fetchReviewWords().then((words) => {
@@ -147,21 +149,26 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                 if (spoilerSettings === 1) {
                     setDisplayWord(originalTranslation);
                     setDisplayTranslation(originalWord  ?? '');
+                    setFlag('🇷🇺');
                 } else if (spoilerSettings === 3) {
                     if (Math.random() < 0.5) {
                         setDisplayWord(originalTranslation);
                         setDisplayTranslation(originalWord  ?? '');
+                        setFlag('🇷🇺');
                     } else {
                         setDisplayWord(originalWord ?? '');
                         setDisplayTranslation(originalTranslation);
+                        setFlag('🇷🇸');
                     }
                 } else {
                     setDisplayWord(originalWord  ?? '');
                     setDisplayTranslation(originalTranslation);
+                    setFlag('🇷🇸');
                 }
             } else {
                 setDisplayWord(originalWord  ?? '');
                 setDisplayTranslation(originalTranslation);
+                setFlag('🇷🇸');
             }
         }
     }, [currentWord, alphabetSettings, spoilerSettings, flipped]);
@@ -195,55 +202,66 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
 
     return (
         <BackgroundBox>
-            <AbsoluteCenter>
-                <VStack  alignItems={"center"} justifyContent="center">
-                <Box>
+            <Center>
+                <VStack maxWidth="300px" alignItems="center" justifyContent="center">
+                    <Box height="20vh"/>
+
+                    <Flag emoji={flag} />
+
                     <Legend legend={currentWord?.legend ?? ''} />
-                </Box>
-                <CardComponent header={displayWord}>
-                    {showTranslation[currentWord.word_id] ? displayTranslation :
-                    <Button
-                        onClick={() => {
-                            setShowTranslation(prev => ({ ...prev, [currentWord.word_id]: true }));
-                            setFlipped(true);
-                        }}
-                        isDisabled={isProcessing}
-                    >
-                        <ViewIcon />
-                    </Button>}
-                </CardComponent>
-                <VStack spacing={1} width="300px" mt="5px" align="center">
-                    <Stack direction='row' width="100%">
-                        <Button variant='primary' width="50%" onClick={() => handleReview(true)} isDisabled={isProcessing}>
-                            <CheckIcon boxSize="6" strokeWidth="2px" />
+                    <Box height="5vw"/>
+                    <VStack alignItems="center" justifyContent="center">
+                        <CardComponent header={displayWord}>
+                            {showTranslation[currentWord.word_id] ? displayTranslation :
+                                <Button
+                                    onClick={() => {
+                                        setShowTranslation(prev => ({ ...prev, [currentWord.word_id]: true }));
+                                        setFlipped(true);
+                                    }}
+                                    isDisabled={isProcessing}
+                                    variant="outline"
+                                    stroke={"grey"}
+                                    borderWidth={"2px"}
+                                >
+                                    <ViewIcon boxSize={6} color="white" stroke="currentColor"/>
+                                </Button>
+                            }
+                        </CardComponent>
+                    </VStack>
+                    <Box height="5vw" />
+                    <VStack spacing={1} mt="5px" align="center" bottom="10vh" position="absolute">
+                        <Stack direction='row' width="100%">
+                            <Button variant='primary' width="50%" onClick={() => handleReview(true)} isDisabled={isProcessing}>
+                                <CheckIcon boxSize="6" strokeWidth="4px" />
+                            </Button>
+                            <Button variant='primary' width="50%" onClick={() => handleReview(false)} isDisabled={isProcessing}>
+                                <CloseIcon boxSize="6" strokeWidth="4px" />
+                            </Button>
+                        </Stack>
+                        <Box height="5vw" />
+                        <Box width="65vw" mt="10px">
+                            <Progress
+                                value={reviewWordsCount}
+                                max={progressBar || 1}
+                                height="2px"
+                                sx={{
+                                    bg: 'black',
+                                    '& > div': {
+                                        bg: 'white',
+                                    }}
+                                }
+                            />
+                        </Box>
+                        <Text align="center" color='white'>
+                            {reviewWordsCount} / {progressBar}
+                        </Text>
+                        <Box height="5vw" />
+                        <Button variant='primary' width="100%" onClick={() => navigate({ to: '/main' })}>
+                            Назад в меню
                         </Button>
-                        <Button variant='primary' width="50%" onClick={() => handleReview(false)} isDisabled={isProcessing}>
-                            <CloseIcon boxSize="6" strokeWidth="2px" />
-                        </Button>
-                    </Stack>
-                    <Box height="5vh" />
-                <Box width="300px" mt="10px"> {/* Move Progress outside VStack */}
-                    <Progress
-                        value={reviewWordsCount}
-                        max={progressBar || 1} // Fallback to prevent division by zero
-                        height="2px"
-                        sx={{
-                            bg: 'black',
-                            '& > div': {
-                                bg: 'white',
-                            },
-                        }}
-                    />
-                </Box>
-                <Box height="0.5vh" />
-
-                <Text align="center" color='white'>{reviewWordsCount} / {progressBar}</Text> {/* Display progress info */}
-
-                <Box height="1.5vh" />
-                <Button variant='primary' width="100%" onClick={() => navigate({ to: '/main' })}>Назад в меню</Button>
+                    </VStack>
                 </VStack>
-                </VStack>
-            </AbsoluteCenter>
+            </Center>
         </BackgroundBox>
-    )
+    );
 }
