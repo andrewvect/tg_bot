@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Button, Text, VStack, Stack, Box} from "@chakra-ui/react"
+import { Button, Text, VStack, Stack, Box, Container, Center} from "@chakra-ui/react"
 import BackgroundBox from '../components/back'
 import { CardComponent } from '../components/Card/card'
 import { UtilsService } from '../client/sdk.gen'
@@ -145,31 +145,42 @@ function NewWord() {
 
     return (
         <BackgroundBox>
-            <AbsoluteCenter>
-                <VStack  alignItems={"center"} justifyContent="center">
-                <Box>
-                    <Legend legend={currentWord?.legend ?? ''} />
-                    <CardComponent header={`${currentWord?.cyrillic_word ?? ''}/${currentWord?.latin_word ?? ''}`}>
-                        {currentWord?.native_word ?? ''}
-                    </CardComponent>
-                </Box>
-                <Box height="40px" />
-                <VStack spacing={1} width="300px" mt="5px" align="center">
-                    <Stack direction='row' width="100%">
-                        <Button variant='primary' width="50%" onClick={handleAddCard}>Добавить</Button>
-                        <Button variant='primary' width="50%" onClick={handleSkipCard}>Уже знаю</Button>
-                    </Stack>
-                    <Box height="1.5wh" />
-                    <Button
-                        variant='primary'
-                        width="100%"
-                        onClick={() => navigate({ to: '/main' })}
-                    >
-                        Назад в меню
-                    </Button>
-                </VStack>
-                </VStack>
-            </AbsoluteCenter>
+            <Center>
+            <VStack maxWidth="300px" alignItems={"center"} justifyContent="center">
+            <Box height="20vh"/>
+
+            <Legend legend={currentWord?.legend ?? ''} />
+
+            <VStack spacing={6} width="100%" alignItems="center" justifyContent="center">
+
+                    <Box height="2vw">
+                    </Box>
+
+
+                    <VStack alignItems="center" justifyContent="center">
+                        <CardComponent header={`${currentWord?.cyrillic_word ?? ''}/${currentWord?.latin_word ?? ''}`}>
+                            {currentWord?.native_word ?? ''}
+                        </CardComponent>
+                    </VStack>
+                    <VStack spacing={1} alignItems="center" width="100%" bottom="20vh" position={"absolute"}>
+                        <Stack direction="row" spacing="-15vw" width="100%">
+                            <Button variant="primary" width="50%" onClick={handleAddCard}>
+                                Добавить
+                            </Button>
+                            <Button variant="primary" width="50%" onClick={handleSkipCard}>
+                                Уже знаю
+                            </Button>
+                        </Stack>
+                        <Box height="3vh"/>
+                        <Button variant="primary" width="100%" onClick={() => navigate({ to: '/main' })}>
+                            Назад в меню
+                        </Button>
+                    </VStack>
+            </VStack>
+            </VStack>
+            </Center>
+
+
         </BackgroundBox>
     )
 }
