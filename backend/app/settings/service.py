@@ -1,6 +1,6 @@
 from app.common.db.models import Settings
 from app.common.db.repositories import SettingsRepo
-from app.schemas.settings import SettingsUpdateRequest  # if needed
+from app.schemas.settings import SettingsUpdateRequest
 
 
 class SettingService:
