@@ -48,7 +48,9 @@ async def set_telegram_web_app_url(bot: Bot):
 
         menu_button = MenuButtonWebApp(
             text="Открыть приложение",
-            web_app=WebAppInfo(url=f"{protocol}://" + settings.DOMAIN + "/api/v1/auth"),
+            web_app=WebAppInfo(
+                url=f"{protocol}://" + "dashboard." + settings.DOMAIN + "/auth"
+            ),
         )
         result = await bot.set_chat_menu_button(menu_button=menu_button)
         if result:
