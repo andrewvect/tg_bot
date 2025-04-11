@@ -41,7 +41,11 @@ def create_app() -> FastAPI:
     async def generic_exception(request, exc):
         """Handle exceptions globally."""
         logger.error(
-            f"Unhandled error: {exc} {request.url} {request.method} {request.body}"
+            "Unhandled error: %s %s %s %s",
+            exc,
+            request.url,
+            request.method,
+            request.body,
         )
         return {"detail": "Internal Server Error"}, 500
 
