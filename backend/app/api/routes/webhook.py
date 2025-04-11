@@ -39,7 +39,9 @@ async def webhook(request: Request) -> Response:
     update = types.Update(**update)
 
     bot = Bot(token=settings.BOT_TOKEN)
-    bot.session.api = TEST
+    if settings.ENVIRONMENT == "local":
+        # For local testing, set the bot to TEST mode
+        bot.session.api = TEST
 
     await dispatcher.feed_update(
         update=update,
