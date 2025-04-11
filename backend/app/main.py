@@ -9,6 +9,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
 from app.core.config import settings
+from app.scripts.set_up_bot import set_up_bot as set_telegram_bot
 from app.states import get_users_states
 from app.utils.logger import logger
 
@@ -16,6 +17,7 @@ from app.utils.logger import logger
 @asynccontextmanager
 async def set_up(app):  # noqa
     """Set up user states."""
+    await set_telegram_bot(mode=settings.ENVIRONMENT)
     global users_states
     users_states = await get_users_states()
     yield
