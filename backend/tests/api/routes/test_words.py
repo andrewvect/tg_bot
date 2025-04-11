@@ -98,7 +98,7 @@ async def test_get_new_word(
     )
 
     assert response.status_code == 200
-    assert len(response.json()["words"]) == 5
+    assert len(response.json()["words"]) == 10
 
 
 @pytest.mark.asyncio
