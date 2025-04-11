@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Button, Text, Center, VStack, Stack, Progress, Box, Container } from "@chakra-ui/react" // replaced AbsoluteCenter with Center
+import { Button, Text, Center, VStack, Stack, Progress, Box } from "@chakra-ui/react" // replaced AbsoluteCenter with Center
 
 import { ViewIcon, CheckIcon, CloseIcon } from "@chakra-ui/icons"
 import BackgroundBox from '../components/back'
