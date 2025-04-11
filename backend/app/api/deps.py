@@ -108,7 +108,7 @@ def verify_token(
 ) -> int:
     """Verify the access token and return the user ID."""
     try:
-        return tokens_service.verify_access_token(token=token)
+        return tokens_service.verify_access_token(token.credentials)
     except ValueError:
         raise HTTPException(
             status_code=401,

@@ -31,8 +31,6 @@ class TokensService:
             raise NotRightTelegramData("Invalid authentication hash")
 
     def verify_access_token(self, token: str) -> int:
-        if token.startswith("Bearer "):
-            token = token[7:]
         try:
             payload = jwt.decode(token, self.config.SECRET_KEY, algorithms=[ALGORITHM])
             return int(payload["sub"])
