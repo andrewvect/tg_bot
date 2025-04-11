@@ -37,10 +37,6 @@ async def new_card(
         logger.error("Error while creating new card: %s", e)
         raise HTTPException(status_code=400, detail=str(e)) from e
 
-    except Exception as e:
-        logger.error("Error while creating new card: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e)) from e
-
 
 @router.get("/", response_model=WordsResponse)
 async def get_new_word(
@@ -67,10 +63,6 @@ async def get_new_word(
     except EndWordsInDb as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
-    except Exception as e:
-        logger.error("Error while getting new words: %s", e)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
-
 
 @router.patch("/review/", response_model=ReviewResponse, status_code=201)
 async def add_review(
@@ -81,15 +73,11 @@ async def add_review(
 ) -> ReviewResponse:
     """Add review to word card"""
 
-    try:
-        await word_service.add_review(
-            user_id=tokens_service.verify_access_token(token=authorization),
-            passed=request.passed,
-            word_id=request.word_id,
-        )
-    except Exception as e:
-        logger.error("Error while adding review: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+    await word_service.add_review(
+        user_id=tokens_service.verify_access_token(token=authorization),
+        passed=request.passed,
+        word_id=request.word_id,
+    )
 
     return ReviewResponse(message="Review added successfully")
 
@@ -119,10 +107,6 @@ async def get_review_words(
     except EndWordsToReview:
         return WordsResponse(words=[])
 
-    except Exception as e:
-        logger.error("Error while getting review words: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
-
 
 @router.get("/review/count", response_model=int)
 async def get_review_words_count(
@@ -131,11 +115,8 @@ async def get_review_words_count(
     authorization: str = Header(None),
 ) -> int:
     """Get count of words available for review"""
-    try:
-        count = word_service.get_review_words_count(
-            user_id=tokens_service.verify_access_token(token=authorization)
-        )
-        return count
-    except Exception as e:
-        logger.error("Error while getting review words count: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+
+    count = word_service.get_review_words_count(
+        user_id=tokens_service.verify_access_token(token=authorization)
+    )
+    return count

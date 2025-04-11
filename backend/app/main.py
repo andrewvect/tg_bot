@@ -10,10 +10,11 @@ from starlette.middleware.cors import CORSMiddleware
 from app.api.main import api_router
 from app.core.config import settings
 from app.states import get_users_states
+from app.utils.logger import logger
 
 
 @asynccontextmanager
-async def set_up(app):
+async def set_up(app):  # noqa
     """Set up user states."""
     global users_states
     users_states = await get_users_states()
@@ -35,6 +36,14 @@ def create_app() -> FastAPI:
         generate_unique_id_function=custom_generate_unique_id,
         lifespan=set_up,
     )
+
+    @app.exception_handler(Exception)
+    async def generic_exception(request, exc):
+        """Handle exceptions globally."""
+        logger.error(
+            f"Unhandled error: {exc} {request.url} {request.method} {request.body}"
+        )
+        return {"detail": "Internal Server Error"}, 500
 
     # Set all CORS enabled origins
     if settings.all_cors_origins:
