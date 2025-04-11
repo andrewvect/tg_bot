@@ -3,8 +3,8 @@ from typing import Annotated
 
 from aiogram import Bot
 from aiogram.utils.web_app import safe_parse_webapp_init_data
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer, OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -90,3 +90,16 @@ def get_settings_repo(session: SessionDep) -> SettingsRepo:
 
 
 SettingsRepoDep = Annotated[SettingsRepo, Depends(get_settings_repo)]
+
+
+def verify_token(
+    tokens_service: TokensServiceDep, token: str = Depends(HTTPBearer())
+) -> int:
+    """Verify the access token and return the user ID."""
+    try:
+        return tokens_service.verify_access_token(token=token)
+    except ValueError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token",
+        )

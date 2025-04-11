@@ -1,8 +1,8 @@
 from venv import logger
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.deps import TokensServiceDep, WordCardHandlerDep
+from app.api.deps import WordCardHandlerDep, verify_token
 from app.common.shemas.words import (
     NewCardRequest,
     NewCardResponce,
@@ -20,19 +20,16 @@ router = APIRouter(prefix="/cards", tags=["utils"])
 async def new_card(
     request: NewCardRequest,
     word_service: WordCardHandlerDep,
-    tokens_service: TokensServiceDep,
-    authorization: str = Header(None),
+    user_id: int = Depends(verify_token),
 ):
-    """Create for user new card"""
+    """Create a new card for the user after verifying the token"""
     try:
         created_card = await word_service.create_new_card(
-            telegram_id=tokens_service.verify_access_token(token=authorization),
+            telegram_id=user_id,
             known=request.known,
             word_id=request.word_id,
         )
-
         return NewCardResponce(**created_card.__dict__)
-
     except ValueError as e:
         logger.error("Error while creating new card: %s", e)
         raise HTTPException(status_code=400, detail=str(e)) from e
@@ -41,14 +38,11 @@ async def new_card(
 @router.get("/", response_model=WordsResponse)
 async def get_new_word(
     word_service: WordCardHandlerDep,
-    tokens_service: TokensServiceDep,
-    authorization: str = Header(None),
+    user_id: int = Depends(verify_token),
 ):
     """Get next new word for user to create card"""
     try:
-        words = await word_service.get_new_words(
-            user_id=tokens_service.verify_access_token(token=authorization)
-        )
+        words = await word_service.get_new_words(user_id=user_id)
         word_responses = [
             WordResponse(
                 word_id=word.id,
@@ -68,13 +62,12 @@ async def get_new_word(
 async def add_review(
     request: ReviewRequest,
     word_service: WordCardHandlerDep,
-    tokens_service: TokensServiceDep,
-    authorization: str = Header(None),
+    user_id: int = Depends(verify_token),
 ) -> ReviewResponse:
     """Add review to word card"""
 
     await word_service.add_review(
-        user_id=tokens_service.verify_access_token(token=authorization),
+        user_id=user_id,
         passed=request.passed,
         word_id=request.word_id,
     )
@@ -85,13 +78,10 @@ async def add_review(
 @router.get("/review/", response_model=WordsResponse)
 async def get_review_words(
     word_service: WordCardHandlerDep,
-    tokens_service: TokensServiceDep,
-    authorization: str = Header(None),
+    user_id: int = Depends(verify_token),
 ) -> WordsResponse:
     try:
-        words = await word_service.get_review_words(
-            user_id=tokens_service.verify_access_token(token=authorization)
-        )
+        words = await word_service.get_review_words(user_id=user_id)
         words = [
             WordResponse(
                 word_id=word.id,
@@ -111,12 +101,9 @@ async def get_review_words(
 @router.get("/review/count", response_model=int)
 async def get_review_words_count(
     word_service: WordCardHandlerDep,
-    tokens_service: TokensServiceDep,
-    authorization: str = Header(None),
+    user_id: int = Depends(verify_token),
 ) -> int:
     """Get count of words available for review"""
 
-    count = word_service.get_review_words_count(
-        user_id=tokens_service.verify_access_token(token=authorization)
-    )
+    count = word_service.get_review_words_count(user_id=user_id)
     return count

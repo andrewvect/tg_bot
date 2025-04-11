@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Depends
 
-from app.api.deps import SettingsRepoDep, TokensServiceDep
+from app.api.deps import SettingsRepoDep, verify_token
 from app.schemas.settings import SettingsResponse, SettingsUpdateRequest
 
 router = APIRouter(prefix="/settings", tags=["settings"])
@@ -9,12 +9,10 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 @router.get("/", response_model=SettingsResponse)
 async def get_user_settings(
     settings_repo: SettingsRepoDep,
-    tokens_service: TokensServiceDep,
-    authorization: str = Header(None),
+    user_id: int = Depends(verify_token),
 ):
     """Get user settings"""
 
-    user_id = tokens_service.verify_access_token(token=authorization)
     user = await settings_repo.get_by_condition(
         condition=settings_repo.type_model.user_id == user_id
     )
@@ -28,13 +26,11 @@ async def get_user_settings(
 @router.put("/", response_model=SettingsResponse)
 async def set_user_settings(
     settings_repo: SettingsRepoDep,
-    tokens_service: TokensServiceDep,
     request: SettingsUpdateRequest,
-    authorization: str = Header(None),
+    user_id: int = Depends(verify_token),
 ):
     """Set user settings"""
 
-    user_id = tokens_service.verify_access_token(token=authorization)
     current_settings = await settings_repo.get_by_condition(
         condition=settings_repo.type_model.user_id == user_id
     )
