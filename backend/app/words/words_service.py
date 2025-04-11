@@ -56,7 +56,7 @@ class WordCardHandler:
 
         return created_card
 
-    async def get_new_words(self, user_id: int, limit: int = 5) -> list[Word]:
+    async def get_new_words(self, user_id: int, limit: int = 20) -> list[Word]:
         """Get new words for user"""
 
         if len(self.cache[user_id].created_cards) == 0:
