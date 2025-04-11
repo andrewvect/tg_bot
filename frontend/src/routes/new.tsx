@@ -162,7 +162,7 @@ function NewWord() {
                             {currentWord?.native_word ?? ''}
                         </CardComponent>
                     </VStack>
-                    <VStack spacing={1} alignItems="center" width="100%" bottom="20vh" position={"absolute"}>
+                    <VStack spacing={1} alignItems="center" width="100%" bottom="15vh" position={"absolute"}>
                         <Stack direction="row" spacing="-15vw" width="100%">
                             <Button variant="primary" width="50%" onClick={handleAddCard}>
                                 Добавить
@@ -171,7 +171,7 @@ function NewWord() {
                                 Уже знаю
                             </Button>
                         </Stack>
-                        <Box height="3vh"/>
+                        <Box height="5vh"/>
                         <Button variant="primary" width="100%" onClick={() => navigate({ to: '/main' })}>
                             Назад в меню
                         </Button>
