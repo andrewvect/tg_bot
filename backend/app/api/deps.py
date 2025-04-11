@@ -12,6 +12,7 @@ from app.common.cache import users_states
 from app.common.db import Database
 from app.common.db.repositories import SettingsRepo
 from app.core.config import settings
+from app.settings.service import SettingService
 from app.token_service import TokensService
 from app.utils.review_algoritm import review_algorithm
 from app.words import WordCardHandler
@@ -90,6 +91,16 @@ def get_settings_repo(session: SessionDep) -> SettingsRepo:
 
 
 SettingsRepoDep = Annotated[SettingsRepo, Depends(get_settings_repo)]
+
+
+# New dependency for SettingService
+def get_settings_service(
+    settings_repo: SettingsRepo = Depends(get_settings_repo),
+) -> SettingService:
+    return SettingService(repository=settings_repo)
+
+
+SettingsServiceDep = Annotated[SettingService, Depends(get_settings_service)]
 
 
 def verify_token(
