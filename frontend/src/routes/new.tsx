@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Button, Text, VStack, Stack, Box, Container, Center} from "@chakra-ui/react"
+import { Button, Text, VStack, Stack, Box, Center} from "@chakra-ui/react"
 import BackgroundBox from '../components/back'
 import { CardComponent } from '../components/Card/card'
 import { UtilsService } from '../client/sdk.gen'
