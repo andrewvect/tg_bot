@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 
 from ..models import Word
 from .abstract import Repository
@@ -58,13 +59,18 @@ class WordRepo(Repository[Word]):
 
     async def get_new_words(self, last_word_id: int, limit: int = 5) -> list[Word]:
         """
-        Get new words for the user with the given user_id.
+        Get new words for the user with the given user_id,
+        eagerly loading the related sentences to avoid n+1 problem.
 
         :param user_id: The ID of the user
         :param last_word_id: The ID of the last word retrieved
-        :return: List of Word entities
+        :return: List of Word entities with sentences
         """
         query = await self.session.execute(
-            select(Word).where(Word.id > last_word_id).order_by(Word.id).limit(limit)
+            select(Word)
+            .options(joinedload(Word.sentences))
+            .where(Word.id > last_word_id)
+            .order_by(Word.id)
+            .limit(limit)
         )
         return query.unique().scalars().all()
