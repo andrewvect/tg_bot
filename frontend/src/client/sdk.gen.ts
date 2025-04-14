@@ -7,19 +7,15 @@ import type {
   HealthCheckHealthCheckResponse,
   LoginLoginAccessTokenData,
   LoginLoginAccessTokenResponse,
-  SettingsGetUserSettingsData,
   SettingsGetUserSettingsResponse,
   SettingsSetUserSettingsData,
   SettingsSetUserSettingsResponse,
+  UtilsGetNewWordResponse,
   UtilsNewCardData,
   UtilsNewCardResponse,
-  UtilsGetNewWordData,
-  UtilsGetNewWordResponse,
+  UtilsGetReviewWordsResponse,
   UtilsAddReviewData,
   UtilsAddReviewResponse,
-  UtilsGetReviewWordsData,
-  UtilsGetReviewWordsResponse,
-  UtilsGetReviewWordsCountData,
   UtilsGetReviewWordsCountResponse,
   WebhookWebhookResponse,
   WebhookWebhook1Response,
@@ -67,23 +63,13 @@ export class SettingsService {
   /**
    * Get User Settings
    * Get user settings
-   * @param data The data for the request.
-   * @param data.authorization
    * @returns SettingsResponse Successful Response
    * @throws ApiError
    */
-  public static getUserSettings(
-    data: SettingsGetUserSettingsData = {},
-  ): CancelablePromise<SettingsGetUserSettingsResponse> {
+  public static getUserSettings(): CancelablePromise<SettingsGetUserSettingsResponse> {
     return __request(OpenAPI, {
       method: "GET",
       url: "/api/v1/settings/",
-      headers: {
-        authorization: data.authorization,
-      },
-      errors: {
-        422: "Validation Error",
-      },
     })
   }
 
@@ -92,7 +78,6 @@ export class SettingsService {
    * Set user settings
    * @param data The data for the request.
    * @param data.requestBody
-   * @param data.authorization
    * @returns SettingsResponse Successful Response
    * @throws ApiError
    */
@@ -102,9 +87,6 @@ export class SettingsService {
     return __request(OpenAPI, {
       method: "PUT",
       url: "/api/v1/settings/",
-      headers: {
-        authorization: data.authorization,
-      },
       body: data.requestBody,
       mediaType: "application/json",
       errors: {
@@ -116,11 +98,23 @@ export class SettingsService {
 
 export class UtilsService {
   /**
+   * Get New Word
+   * Get next new word for user to create card
+   * @returns WordsResponse Successful Response
+   * @throws ApiError
+   */
+  public static getNewWord(): CancelablePromise<UtilsGetNewWordResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/cards/",
+    })
+  }
+
+  /**
    * New Card
-   * Create for user new card
+   * Create a new card for the user after verifying the token
    * @param data The data for the request.
    * @param data.requestBody
-   * @param data.authorization
    * @returns NewCardResponce Successful Response
    * @throws ApiError
    */
@@ -130,58 +124,6 @@ export class UtilsService {
     return __request(OpenAPI, {
       method: "POST",
       url: "/api/v1/cards/",
-      headers: {
-        authorization: data.authorization,
-      },
-      body: data.requestBody,
-      mediaType: "application/json",
-      errors: {
-        422: "Validation Error",
-      },
-    })
-  }
-
-  /**
-   * Get New Word
-   * Get next new word for user to create card
-   * @param data The data for the request.
-   * @param data.authorization
-   * @returns WordsResponse Successful Response
-   * @throws ApiError
-   */
-  public static getNewWord(
-    data: UtilsGetNewWordData = {},
-  ): CancelablePromise<UtilsGetNewWordResponse> {
-    return __request(OpenAPI, {
-      method: "GET",
-      url: "/api/v1/cards/",
-      headers: {
-        authorization: data.authorization,
-      },
-      errors: {
-        422: "Validation Error",
-      },
-    })
-  }
-
-  /**
-   * Add Review
-   * Add review to word card
-   * @param data The data for the request.
-   * @param data.requestBody
-   * @param data.authorization
-   * @returns ReviewResponse Successful Response
-   * @throws ApiError
-   */
-  public static addReview(
-    data: UtilsAddReviewData,
-  ): CancelablePromise<UtilsAddReviewResponse> {
-    return __request(OpenAPI, {
-      method: "PATCH",
-      url: "/api/v1/cards/review/",
-      headers: {
-        authorization: data.authorization,
-      },
       body: data.requestBody,
       mediaType: "application/json",
       errors: {
@@ -192,20 +134,32 @@ export class UtilsService {
 
   /**
    * Get Review Words
-   * @param data The data for the request.
-   * @param data.authorization
    * @returns WordsResponse Successful Response
    * @throws ApiError
    */
-  public static getReviewWords(
-    data: UtilsGetReviewWordsData = {},
-  ): CancelablePromise<UtilsGetReviewWordsResponse> {
+  public static getReviewWords(): CancelablePromise<UtilsGetReviewWordsResponse> {
     return __request(OpenAPI, {
       method: "GET",
       url: "/api/v1/cards/review/",
-      headers: {
-        authorization: data.authorization,
-      },
+    })
+  }
+
+  /**
+   * Add Review
+   * Add review to word card
+   * @param data The data for the request.
+   * @param data.requestBody
+   * @returns ReviewResponse Successful Response
+   * @throws ApiError
+   */
+  public static addReview(
+    data: UtilsAddReviewData,
+  ): CancelablePromise<UtilsAddReviewResponse> {
+    return __request(OpenAPI, {
+      method: "PATCH",
+      url: "/api/v1/cards/review/",
+      body: data.requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
@@ -215,23 +169,13 @@ export class UtilsService {
   /**
    * Get Review Words Count
    * Get count of words available for review
-   * @param data The data for the request.
-   * @param data.authorization
    * @returns number Successful Response
    * @throws ApiError
    */
-  public static getReviewWordsCount(
-    data: UtilsGetReviewWordsCountData = {},
-  ): CancelablePromise<UtilsGetReviewWordsCountResponse> {
+  public static getReviewWordsCount(): CancelablePromise<UtilsGetReviewWordsCountResponse> {
     return __request(OpenAPI, {
       method: "GET",
       url: "/api/v1/cards/review/count",
-      headers: {
-        authorization: data.authorization,
-      },
-      errors: {
-        422: "Validation Error",
-      },
     })
   }
 }

@@ -36,6 +36,13 @@ export type ReviewResponse = {
   message: string
 }
 
+export type SentenceResponce = {
+  id: number
+  native_text: string
+  cyrilic_text: string
+  latin_text: string
+}
+
 export type SettingsResponse = {
   spoiler_settings: number
   user_id: number
@@ -65,6 +72,7 @@ export type WordResponse = {
   cyrillic_word: string
   native_word: string
   legend?: string | null
+  sentences?: Array<SentenceResponce> | null
 }
 
 export type WordsResponse = {
@@ -79,48 +87,29 @@ export type LoginLoginAccessTokenData = {
 
 export type LoginLoginAccessTokenResponse = ResponceToken
 
-export type SettingsGetUserSettingsData = {
-  authorization?: string
-}
-
 export type SettingsGetUserSettingsResponse = SettingsResponse
 
 export type SettingsSetUserSettingsData = {
-  authorization?: string
   requestBody: SettingsUpdateRequest
 }
 
 export type SettingsSetUserSettingsResponse = SettingsResponse
 
+export type UtilsGetNewWordResponse = WordsResponse
+
 export type UtilsNewCardData = {
-  authorization?: string
   requestBody: NewCardRequest
 }
 
 export type UtilsNewCardResponse = NewCardResponce
 
-export type UtilsGetNewWordData = {
-  authorization?: string
-}
-
-export type UtilsGetNewWordResponse = WordsResponse
+export type UtilsGetReviewWordsResponse = WordsResponse
 
 export type UtilsAddReviewData = {
-  authorization?: string
   requestBody: ReviewRequest
 }
 
 export type UtilsAddReviewResponse = ReviewResponse
-
-export type UtilsGetReviewWordsData = {
-  authorization?: string
-}
-
-export type UtilsGetReviewWordsResponse = WordsResponse
-
-export type UtilsGetReviewWordsCountData = {
-  authorization?: string
-}
 
 export type UtilsGetReviewWordsCountResponse = number
 
