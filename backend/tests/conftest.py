@@ -14,7 +14,7 @@ from sqlalchemy.pool import NullPool
 
 from app.api.deps import get_session, get_tokens_service
 from app.common.cache.states import UserProfile, users_states
-from app.common.db.models import Base, Card, Settings, User, Word
+from app.common.db.models import Base, Card, Sentence, Settings, User, Word
 from app.core.config import settings
 from app.main import create_app
 
@@ -169,6 +169,28 @@ def db_with_cards(db_session, test_user, db_with_words):
         cards.append(card)
     db_session.commit()
     return cards
+
+
+@pytest.fixture(scope="function")
+def db_with_sentences(
+    db_session,  # noqa F811
+    test_user: User,  # noqa F811
+    db_with_words: list[Word],  # noqa F811
+) -> list[Sentence]:
+    sentences = []
+    fake = Faker()
+    for word in db_with_words:
+        for _ in range(3):
+            sentence_obj = Sentence(
+                native_text=fake.unique.sentence(),
+                cyrilic_text=fake.unique.sentence(),
+                latin_text=fake.unique.sentence(),
+                word_id=word.id,
+            )
+            db_session.add(sentence_obj)
+            sentences.append(sentence_obj)
+    db_session.commit()
+    return sentences
 
 
 @pytest.fixture(scope="function")
