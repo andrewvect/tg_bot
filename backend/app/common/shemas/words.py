@@ -12,12 +12,20 @@ class ReviewResponse(BaseModel):
     message: str
 
 
+class SentenceResponce(BaseModel):
+    id: int
+    native_text: str
+    cyrilic_text: str
+    latin_text: str
+
+
 class WordResponse(BaseModel):
     word_id: int
     latin_word: str
     cyrillic_word: str
     native_word: str
     legend: str | None = None
+    sentences: list[SentenceResponce] | None = None
 
 
 class WordsResponse(BaseModel):
