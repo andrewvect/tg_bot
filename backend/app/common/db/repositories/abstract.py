@@ -31,13 +31,14 @@ class Repository(Generic[AbstractModel]):
         return (await self.session.execute(statement)).scalar()
 
     async def get_many(
-        self, condition, limit: int = 100, order_by=None
+        self, condition, limit: int = 100, order_by=None, options: list = None
     ) -> Sequence[Base]:
         """Fetch many entities that meet the condition, with optional sorting and limit."""
         statement = select(self.type_model).where(condition).limit(limit)
         if order_by:
             statement = statement.order_by(order_by)
-
+        if options:
+            statement = statement.options(*options)
         return (await self.session.scalars(statement)).unique().all()
 
     async def fetch_many(self, condition, limit: int = 100) -> Sequence[Base]:
