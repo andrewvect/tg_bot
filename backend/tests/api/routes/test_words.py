@@ -1,4 +1,5 @@
 import pytest
+from sqlalchemy.orm.session import Session
 
 from app.common.cache.states import users_states
 from app.common.db.models import Card
@@ -224,3 +225,53 @@ async def test_legend_field_in_response(
     # check legend field
     assert response.json()["words"][0]["legend"] is not None
     assert response.json()["words"][0]["legend"] == db_with_words[0].legend
+
+
+@pytest.mark.asyncio
+async def test_return_sentences(
+    client,
+    test_user,  # noqa
+    db_with_words,  # noqa
+    db_with_sentences,  # noqa
+    db_session: Session,  # noqa
+    set_up_cache,  # noqa
+    mock_tokens_service,  # noqa
+):
+    """Test return sentences for word"""
+
+    response = await client.get(
+        "api/v1/cards/",
+        headers={"Authorization": "Bearer some_token"},
+    )
+
+    assert response.status_code == 200
+    sentences = response.json()["words"][0]["sentences"]
+    # For each sentence, check that after removing an optional 'id' key,
+    # exactly 3 objects are present.
+    expected_keys = {"id", "cyrilic_text", "latin_text", "native_text"}
+    for sentence in sentences:
+        assert set(sentence.keys()) == expected_keys
+
+
+@pytest.mark.asyncio
+async def test_return_sentences_with_review_words(
+    client,
+    test_user,  # noqa
+    db_with_words,  # noqa
+    db_with_sentences,  # noqa
+    db_session: Session,  # noqa
+    cache_with_created_cards,  # noqa
+    mock_tokens_service,  # noqa
+):
+    """Test return sentences for word"""
+
+    response = await client.get(
+        "api/v1/cards/review/",
+        headers={"Authorization": "Bearer some_token"},
+    )
+
+    assert response.status_code == 200
+    sentences = response.json()["words"][0]["sentences"]
+    expected_keys = {"id", "cyrilic_text", "latin_text", "native_text"}
+    for sentence in sentences:
+        assert set(sentence.keys()) == expected_keys
