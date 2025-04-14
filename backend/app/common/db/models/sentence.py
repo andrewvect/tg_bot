@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -8,13 +8,14 @@ class Sentence(Base):
     """Sentence model"""
 
     # Fields
-    native_text: Mapped[str] = mapped_column(
-        String(length=255), nullable=False, index=True
-    )
+    native_text: Mapped[str] = mapped_column(Text, nullable=False)
     """ Native sentence text """
 
-    foreign_text: Mapped[str] = mapped_column(String(length=255), nullable=False)
-    """ Foreign sentence text """
+    cyrilic_text: Mapped[str] = mapped_column(Text, nullable=False)
+    """ Cyrillic sentence text """
+
+    latin_text: Mapped[str] = mapped_column(Text, nullable=False)
+    """ Latin sentence text """
 
     word_id: Mapped[int] = mapped_column(
         ForeignKey("word.id"), nullable=False, index=True
@@ -28,7 +29,21 @@ class Sentence(Base):
     """ Relationship to the Word model """
 
     def __str__(self):
-        return f"{self.native_text} - {self.foreign_text}"
+        return (
+            f"{self.native_text} "
+            f"- "
+            f"{self.cyrilic_text} "
+            f"- "
+            f"{self.latin_text}"
+        )
 
     def __repr__(self):
-        return f"<Sentence(id={self.id}, native_text={self.native_text}, foreign_text={self.foreign_text})>"
+        return (
+            f"<Sentence("
+            f"id={self.id}, "
+            f"native_text={self.native_text}, "
+            f"cyrilic_text={self.cyrilic_text}, "
+            f"latin_text={self.latin_text}, "
+            f"word_id={self.word_id}"
+            f")>"
+        )
