@@ -8,6 +8,7 @@ from app.common.shemas.words import (
     NewCardResponce,
     ReviewRequest,
     ReviewResponse,
+    SentenceResponce,
     WordResponse,
     WordsResponse,
 )
@@ -50,6 +51,17 @@ async def get_new_word(
                 cyrillic_word=word.cyrillic_word,
                 native_word=word.native_word,
                 legend=word.legend,
+                sentences=[
+                    SentenceResponce(
+                        id=sentence.id,
+                        native_text=sentence.native_text,
+                        cyrilic_text=sentence.cyrilic_text,
+                        latin_text=sentence.latin_text,
+                    )
+                    for sentence in word.sentences
+                ]
+                if word.sentences
+                else [],
             )
             for word in words
         ]
@@ -89,6 +101,17 @@ async def get_review_words(
                 cyrillic_word=word.cyrillic_word,
                 native_word=word.native_word,
                 legend=word.legend,
+                sentences=[
+                    SentenceResponce(
+                        id=sentence.id,
+                        native_text=sentence.native_text,
+                        cyrilic_text=sentence.cyrilic_text,
+                        latin_text=sentence.latin_text,
+                    )
+                    for sentence in word.sentences
+                ]
+                if word.sentences
+                else [],
             )
             for word in words
         ]
