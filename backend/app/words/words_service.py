@@ -1,5 +1,7 @@
 import datetime
 
+from sqlalchemy.orm import joinedload
+
 from app.common.cache.states import UserProfile
 from app.common.db.database import Database
 from app.common.db.models import Word
@@ -97,7 +99,10 @@ class WordCardHandler:
 
         review_words_ids = self.cache[user_id].review_cards[0:limit]
 
-        words = await self.db.word.get_many(condition=Word.id.in_(review_words_ids))
+        words = await self.db.word.get_many(
+            condition=Word.id.in_(review_words_ids),
+            options=[joinedload(Word.sentences)],
+        )
 
         if not words:
             raise EndWordsToReview("No words to review")
