@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { LoginService } from '../client/sdk.gen'
 import { useEffect, useState } from 'react'
 import { Alert } from "@chakra-ui/react"
+import { OpenAPI } from '../client/core/OpenAPI'
 
 interface TelegramWebApp {
   initData: string;
@@ -40,7 +41,7 @@ function AuthPage() {
         })
 
         if (response.access_token) {
-          localStorage.setItem('token', response.access_token)
+          localStorage.setItem('token', response.access_token) // Store token in localStorage only
           localStorage.removeItem('review_words')
           localStorage.removeItem('new_words');
 
