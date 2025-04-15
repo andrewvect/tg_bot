@@ -17,12 +17,8 @@ export const Route = createFileRoute('/review')({
 })
 
 async function fetchReviewWords() {
-    const token = localStorage.getItem('token')
-
     // Fetch words from API
-    const response = await UtilsService.getReviewWords({
-        authorization: `Bearer ${token}`
-    })
+    const response = await UtilsService.getReviewWords()
 
     if (!response.words || response.words.length === 0) {
         return [];
@@ -32,12 +28,7 @@ async function fetchReviewWords() {
 }
 
 async function submitReview(data: { passed: boolean; word_id: number }): Promise<void> {
-    const token = localStorage.getItem('token')
-    if (!token) {
-        throw new Error('No token found')
-    }
     await UtilsService.addReview({
-        authorization: `Bearer ${token}`,
         requestBody: {
             passed: data.passed,
             word_id: data.word_id
@@ -46,23 +37,11 @@ async function submitReview(data: { passed: boolean; word_id: number }): Promise
 }
 
 async function fetchUserSettings() {
-    const token = localStorage.getItem('token')
-    if (!token) {
-        throw new Error('No token found')
-    }
-    return SettingsService.getUserSettings({
-        authorization: `Bearer ${token}`
-    })
+    return SettingsService.getUserSettings()
 }
 
 async function getReviewWordsCount() {
-    const token = localStorage.getItem('token')
-    if (!token) {
-        throw new Error('No token found')
-    }
-    return UtilsService.getReviewWordsCount({
-        authorization: `Bearer ${token}`
-    })
+    return UtilsService.getReviewWordsCount()
 }
 
 function ReviewPage() {
@@ -208,7 +187,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
 
                     <Flag emoji={flag} />
 
-                    <Legend legend={currentWord?.legend ?? ''} />
+                    <Legend header={currentWord?.legend ?? ''} sentences={[currentWord]} />
                     <Box height="5vw"/>
                     <VStack alignItems="center" justifyContent="center">
                         <CardComponent header={displayWord}>
