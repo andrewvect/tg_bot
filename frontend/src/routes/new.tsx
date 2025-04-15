@@ -30,7 +30,6 @@ async function addNewCard(data: { known: boolean; word_id: number }): Promise<vo
         throw new Error('No token found')
     }
     await UtilsService.newCard({
-        authorization: `Bearer ${token}`,
         requestBody: {
             known: data.known,
             word_id: data.word_id
@@ -43,6 +42,7 @@ function NewWord() {
     const [words, setWords] = useState<WordResponse[]>([])
     const [loading, setLoading] = useState(true)
 
+
     useEffect(() => {
         loadWords()
     }, [])
@@ -50,11 +50,9 @@ function NewWord() {
     async function loadWords(optionalInt?: number) {
         setLoading(true)
 
-        const token = localStorage.getItem('token')
-
         if (!optionalInt) {
         try {
-            const response = await UtilsService.getNewWord({ authorization: `Bearer ${token}` })
+            const response = await UtilsService.getNewWord()
             if (response.words.length > 0) {
                 localStorage.setItem('new_words', JSON.stringify(response.words))
                 setWords(response.words)
@@ -72,7 +70,7 @@ function NewWord() {
         }
         } else {
             try {
-                const response = await UtilsService.getNewWord({ authorization: `Bearer ${token}` })
+                const response = await UtilsService.getNewWord()
                 if (response.words.length > 0) {
                     localStorage.setItem('new_words', JSON.stringify(response.words))
                     setWords(response.words)
@@ -149,13 +147,12 @@ function NewWord() {
             <VStack maxWidth="300px" alignItems={"center"} justifyContent="center">
             <Box height="20vh"/>
 
-            <Legend legend={currentWord?.legend ?? ''} />
+            <Legend header={currentWord?.legend ?? ''} sentences={[currentWord]} />
 
             <VStack spacing={6} width="100%" alignItems="center" justifyContent="center">
 
                     <Box height="2vw">
                     </Box>
-
 
                     <VStack alignItems="center" justifyContent="center">
                         <CardComponent header={`${currentWord?.cyrillic_word ?? ''}/${currentWord?.latin_word ?? ''}`}>
