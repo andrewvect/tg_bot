@@ -114,5 +114,3 @@ export type UtilsAddReviewResponse = ReviewResponse
 export type UtilsGetReviewWordsCountResponse = number
 
 export type WebhookWebhookResponse = unknown
-
-export type WebhookWebhook1Response = unknown
