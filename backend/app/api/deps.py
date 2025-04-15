@@ -4,7 +4,11 @@ from typing import Annotated
 from aiogram import Bot
 from aiogram.utils.web_app import safe_parse_webapp_init_data
 from fastapi import Depends, HTTPException
-from fastapi.security import HTTPBearer, OAuth2PasswordBearer
+from fastapi.security import (
+    HTTPAuthorizationCredentials,
+    HTTPBearer,
+    OAuth2PasswordBearer,
+)
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -102,9 +106,13 @@ def get_settings_service(
 
 SettingsServiceDep = Annotated[SettingService, Depends(get_settings_service)]
 
+# Set auto_error to True to enforce that the Authorization header is required
+security_dep = HTTPBearer()
+
 
 def verify_token(
-    tokens_service: TokensServiceDep, token: str = Depends(HTTPBearer())
+    tokens_service: TokensServiceDep,
+    token: Annotated[HTTPAuthorizationCredentials, Depends(security_dep)],
 ) -> int:
     """Verify the access token and return the user ID."""
     try:
