@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 import sentry_sdk
 from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
 
@@ -38,6 +39,39 @@ def create_app() -> FastAPI:
         generate_unique_id_function=custom_generate_unique_id,
         lifespan=set_up,
     )
+
+    # Add this function to customize the OpenAPI schema with security
+    def custom_openapi():
+        if app.openapi_schema:
+            return app.openapi_schema
+
+        openapi_schema = get_openapi(
+            title=app.title,
+            version=app.version,
+            description=app.description,
+            routes=app.routes,
+        )
+
+        # Add Bearer Authentication security scheme
+        openapi_schema["components"] = openapi_schema.get("components", {})
+        openapi_schema["components"]["securitySchemes"] = {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+            }
+        }
+
+        # Add security requirement to all operations
+        for path_key, path_item in openapi_schema["paths"].items():
+            if path_key.startswith("/api/v1/cards"):  # Target only card endpoints
+                for operation_key in path_item:
+                    if operation_key in ["get", "post", "patch", "put", "delete"]:
+                        path_item[operation_key]["security"] = [{"BearerAuth": []}]
+
+        app.openapi_schema = openapi_schema
+        return app.openapi_schema
+
+    app.openapi = custom_openapi
 
     @app.exception_handler(Exception)
     async def generic_exception(request, exc):
