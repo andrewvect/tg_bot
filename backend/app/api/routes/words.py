@@ -1,6 +1,7 @@
 from venv import logger
 
-from fastapi import APIRouter, Depends, HTTPException
+# ensure Security is imported
+from fastapi import APIRouter, HTTPException, Security
 
 from app.api.deps import WordCardHandlerDep, verify_token
 from app.common.shemas.words import (
@@ -21,7 +22,7 @@ router = APIRouter(prefix="/cards", tags=["utils"])
 async def new_card(
     request: NewCardRequest,
     word_service: WordCardHandlerDep,
-    user_id: int = Depends(verify_token),
+    user_id: int = Security(verify_token),
 ):
     """Create a new card for the user after verifying the token"""
     try:
@@ -39,7 +40,7 @@ async def new_card(
 @router.get("/", response_model=WordsResponse)
 async def get_new_word(
     word_service: WordCardHandlerDep,
-    user_id: int = Depends(verify_token),
+    user_id: int = Security(verify_token),
 ):
     """Get next new word for user to create card"""
     try:
@@ -74,7 +75,7 @@ async def get_new_word(
 async def add_review(
     request: ReviewRequest,
     word_service: WordCardHandlerDep,
-    user_id: int = Depends(verify_token),
+    user_id: int = Security(verify_token),
 ) -> ReviewResponse:
     """Add review to word card"""
 
@@ -90,7 +91,7 @@ async def add_review(
 @router.get("/review/", response_model=WordsResponse)
 async def get_review_words(
     word_service: WordCardHandlerDep,
-    user_id: int = Depends(verify_token),
+    user_id: int = Security(verify_token),
 ) -> WordsResponse:
     try:
         words = await word_service.get_review_words(user_id=user_id)
@@ -124,7 +125,7 @@ async def get_review_words(
 @router.get("/review/count", response_model=int)
 async def get_review_words_count(
     word_service: WordCardHandlerDep,
-    user_id: int = Depends(verify_token),
+    user_id: int = Security(verify_token),
 ) -> int:
     """Get count of words available for review"""
 
