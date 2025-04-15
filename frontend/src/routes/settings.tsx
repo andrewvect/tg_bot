@@ -19,15 +19,7 @@ function NewWord() {
     const [loading, setLoading] = useState(true) // New loading state
 
     useEffect(() => {
-        const token = localStorage.getItem('token')
-        if (!token) {
-            console.error('No token found')
-            setLoading(false) // Stop loading if no token
-            return;
-        }
-        SettingsService.getUserSettings({
-            authorization: `Bearer ${token}`,
-        })
+        SettingsService.getUserSettings()
             .then((res: SettingsGetUserSettingsResponse) => {
                 setDisplaySetting(String(res.spoiler_settings))
                 setAlphabetSetting(String(res.alphabet_settings))
@@ -42,13 +34,7 @@ function NewWord() {
         setDisplaySetting(newDisplay);
         setAlphabetSetting(newAlphabet);
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
             await SettingsService.setUserSettings({
-                authorization: `Bearer ${token}`,
                 requestBody: {
                     spoiler_settings: Number(newDisplay),
                     alphabet_settings: Number(newAlphabet),
