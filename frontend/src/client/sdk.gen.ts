@@ -18,7 +18,6 @@ import type {
   UtilsAddReviewResponse,
   UtilsGetReviewWordsCountResponse,
   WebhookWebhookResponse,
-  WebhookWebhook1Response,
 } from "./types.gen"
 
 export class HealthCheckService {
@@ -197,25 +196,6 @@ export class WebhookService {
     return __request(OpenAPI, {
       method: "POST",
       url: "/api/v1/webhook/",
-    })
-  }
-
-  /**
-   * Webhook
-   * Handle incoming updates from Telegram bot.
-   *
-   * Args:
-   * request: FastAPI request object containing the update from Telegram
-   *
-   * Returns:
-   * Response with appropriate status code
-   * @returns unknown Successful Response
-   * @throws ApiError
-   */
-  public static webhook1(): CancelablePromise<WebhookWebhook1Response> {
-    return __request(OpenAPI, {
-      method: "POST",
-      url: "/api/v1/webhook",
     })
   }
 }
