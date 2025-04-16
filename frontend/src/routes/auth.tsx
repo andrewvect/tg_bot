@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { LoginService } from '../client/sdk.gen'
 import { useEffect, useState } from 'react'
 import { Alert } from "@chakra-ui/react"
-import { OpenAPI } from '../client/core/OpenAPI'
 
 interface TelegramWebApp {
   initData: string;
