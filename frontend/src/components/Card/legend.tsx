@@ -4,10 +4,11 @@ import { WordResponse } from '../../client/types.gen'
 
 interface LegendProps {
 	sentences: WordResponse[],
-	header: string
+	header: string,
+	alphabetSettings: number | null,
 }
 
-export const Legend = ({ sentences, header }: LegendProps) => {
+export const Legend = ({ sentences, header, alphabetSettings }: LegendProps) => {
 
 	return (
 		<Box>
@@ -33,7 +34,7 @@ export const Legend = ({ sentences, header }: LegendProps) => {
 							<Text mb={2}>{header}</Text>
 							{sentences && sentences.length > 0 && (
 								<>
-									<Sentences sentences={sentences[0]?.sentences ?? []} />
+									<Sentences sentences={sentences[0]?.sentences ?? []} alphabetSettings={alphabetSettings} />
 								</>
 							)}
 						</PopoverBody>

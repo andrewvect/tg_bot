@@ -5,9 +5,10 @@ import { WordResponse } from '../../client/types.gen';
 
 interface SentencesProps {
     sentences: WordResponse['sentences'];
+    alphabetSettings: number | null;
 }
 
-const Sentences: React.FC<SentencesProps> = ({ sentences }) => {
+const Sentences: React.FC<SentencesProps> = ({ sentences, alphabetSettings }) => {
     if (!sentences) return null;
 
     const formatTextWithBold = (text: string) => {
@@ -38,8 +39,22 @@ const Sentences: React.FC<SentencesProps> = ({ sentences }) => {
                     <Box>
                         <Text>{formatTextWithBold(sentence.native_text)}</Text>
                         <Box height="0.5vh"></Box>
-                        <Text>{formatTextWithBold(sentence.cyrilic_text)}</Text>
-                        <Text>{formatTextWithBold(sentence.latin_text)}</Text>
+
+                        {/* Show text based on alphabet settings */}
+                        {(alphabetSettings === null) && (
+                            <>
+                                <Text>{formatTextWithBold(sentence.cyrilic_text)}</Text>
+                                <Text>{formatTextWithBold(sentence.latin_text)}</Text>
+                            </>
+                        )}
+
+                        {(alphabetSettings === 3) && (
+                            <Text>{formatTextWithBold(sentence.latin_text)}</Text>
+                        )}
+
+                        {(alphabetSettings === 2) && (
+                            <Text>{formatTextWithBold(sentence.cyrilic_text)}</Text>
+                        )}
                     </Box>
                 </ListItem>
             ))}

@@ -105,6 +105,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
     const [displayWord, setDisplayWord] = useState<string>('')
     const [displayTranslation, setDisplayTranslation] = useState<string>('')
     const [flag, setFlag] = useState<string>('')
+    const [choosedAlphabet, setChoosedAlphabet] = useState<number>(0)
 
     useEffect(() => {
         fetchReviewWords().then((words) => {
@@ -114,14 +115,27 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
     }, [])
 
     useEffect(() => {
+
         if (currentWord) {
             let originalWord;
             if (alphabetSettings === 3) {
                 originalWord = currentWord.latin_word;
+                setChoosedAlphabet(3);
             } else if (alphabetSettings === 2) {
                 originalWord = currentWord.cyrillic_word;
+                setChoosedAlphabet(2);
             } else if (alphabetSettings === 1) {
-                originalWord = Math.random() < 0.5 ? currentWord.latin_word : currentWord.cyrillic_word;
+                let randomNum = Math.random();
+
+                if (randomNum < 0.5) {
+                    originalWord = currentWord.latin_word;
+                    setChoosedAlphabet(3);
+                } else {
+                    originalWord = currentWord.cyrillic_word;
+                    setChoosedAlphabet(2);
+                }
+
+                ;
             }
             let originalTranslation = currentWord.native_word;
             if (flipped) {
@@ -150,7 +164,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                 setFlag('🇷🇸');
             }
         }
-    }, [currentWord, alphabetSettings, spoilerSettings, flipped]);
+    }, [currentWord, choosedAlphabet, spoilerSettings, flipped]);
 
     const handleReview = (passed: boolean) => {
         if (isProcessing || !currentWord) return
@@ -187,7 +201,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
 
                     <Flag emoji={flag} />
 
-                    <Legend header={currentWord?.legend ?? ''} sentences={[currentWord]} />
+                    <Legend header={currentWord?.legend ?? ''} sentences={[currentWord]} alphabetSettings={choosedAlphabet} />
                     <Box height="5vw"/>
                     <VStack alignItems="center" justifyContent="center">
                         <CardComponent header={displayWord}>

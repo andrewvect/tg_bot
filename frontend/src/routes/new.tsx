@@ -147,7 +147,7 @@ function NewWord() {
             <VStack maxWidth="300px" alignItems={"center"} justifyContent="center">
             <Box height="20vh"/>
 
-            <Legend header={currentWord?.legend ?? ''} sentences={[currentWord]} />
+            <Legend header={currentWord?.legend ?? ''} sentences={[currentWord]} alphabetSettings={null} />
 
             <VStack spacing={6} width="100%" alignItems="center" justifyContent="center">
 
