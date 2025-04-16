@@ -15,9 +15,7 @@ function Main() {
     useEffect(() => {
         const token = localStorage.getItem('token')
         if (token) {
-            UtilsService.getReviewWordsCount({
-                authorization: `Bearer ${token}`
-            })
+            UtilsService.getReviewWordsCount()
             .then(response => {
                 const count = response ?? 0;
                 const reviewWordsCount = String(count);
