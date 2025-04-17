@@ -105,6 +105,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
     const [displayWord, setDisplayWord] = useState<string>('')
     const [displayTranslation, setDisplayTranslation] = useState<string>('')
     const [flag, setFlag] = useState<string>('')
+    const [alphabet, setAlphabet] = useState<string>('')
     const [choosedAlphabet, setChoosedAlphabet] = useState<number>(0)
 
     useEffect(() => {
@@ -121,18 +122,22 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
             if (alphabetSettings === 3) {
                 originalWord = currentWord.latin_word;
                 setChoosedAlphabet(3);
+                setAlphabet('🔠');
             } else if (alphabetSettings === 2) {
                 originalWord = currentWord.cyrillic_word;
                 setChoosedAlphabet(2);
+                setAlphabet('');
             } else if (alphabetSettings === 1) {
                 let randomNum = Math.random();
 
                 if (randomNum < 0.5) {
                     originalWord = currentWord.latin_word;
                     setChoosedAlphabet(3);
+                    setAlphabet('🔠');
                 } else {
                     originalWord = currentWord.cyrillic_word;
                     setChoosedAlphabet(2);
+                    setAlphabet('');
                 }
 
                 ;
@@ -199,7 +204,7 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                 <VStack maxWidth="300px" alignItems="center" justifyContent="center">
                     <Box height="20vh"/>
 
-                    <Flag emoji={flag} />
+                    <Flag emoji={flag + alphabet} />
 
                     <Legend header={currentWord?.legend ?? ''} sentences={[currentWord]} alphabetSettings={choosedAlphabet} />
                     <Box height="5vw"/>
