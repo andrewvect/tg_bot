@@ -20,19 +20,21 @@ def review_algorithm(
     if review_date is None:
         review_date = datetime.now()
 
-    # values which define how many minutes should pass before next review
-    values = {
-        1: 20,
-        2: 60,
-        3: 120,
-        4: 240,
-        5: 480,
-        6: 960,
-        7: 1920,
-        8: 3840,
-        9: 7680,
-        10: 15360,
+    # Constants for review intervals in minutes
+    REVIEW_INTERVALS = {
+        1: 20,  # 20 minutes
+        2: 60,  # 1 hour
+        3: 120,  # 2 hours
+        4: 240,  # 4 hours
+        5: 480,  # 8 hours
+        6: 960,  # 16 hours
+        7: 1920,  # 32 hours (1.33 days)
+        8: 3840,  # 64 hours (2.67 days)
+        9: 7680,  # 128 hours (5.33 days)
+        10: 15360,  # 256 hours (10.67 days)
     }
+
+    values = REVIEW_INTERVALS
 
     if passed:
         if checks > 10:
