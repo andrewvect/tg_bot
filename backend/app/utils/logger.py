@@ -1,5 +1,9 @@
 import logging
+import os
 import sys
+from logging.handlers import RotatingFileHandler
+
+from app.core.config import settings
 
 # ANSI color codes
 COLORS = {
@@ -47,6 +51,34 @@ def setup_logger(name: str = __name__, level: int = logging.INFO) -> logging.Log
     # Add handler to logger
     if not logger.handlers:
         logger.addHandler(console_handler)
+
+        # Add file logging in production environment
+        if settings.ENVIRONMENT == "production":
+            # Create logs directory if it doesn't exist
+            log_dir = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "logs"
+            )
+            os.makedirs(log_dir, exist_ok=True)
+
+            # Set up rotating file handler (100MB max size)
+            log_file = os.path.join(log_dir, f"{name}.log")
+            file_handler = RotatingFileHandler(
+                log_file,
+                maxBytes=100 * 1024 * 1024,  # 100MB
+                backupCount=5,  # Keep 5 backup files
+                encoding="utf-8",
+            )
+            file_handler.setLevel(max(logging.INFO, level))
+
+            # Create plain formatter for file (without colors)
+            file_formatter = logging.Formatter(
+                "%(asctime)s - %(levelname)s - %(name)s:%(lineno)d - %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S",
+            )
+            file_handler.setFormatter(file_formatter)
+
+            # Add file handler to logger
+            logger.addHandler(file_handler)
 
     return logger
 
