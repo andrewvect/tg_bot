@@ -6,9 +6,14 @@ interface FlagProps {
 
 export const Flag = ({ emoji }: FlagProps) => {
     return (
-        <Box >
+        <Box>
         <Circle size="6" top="15vh" left="15vw" position="absolute">
-            <span style={{ fontSize: '30px' }}>{emoji}</span>
+            <span style={{
+                fontSize: '30px',
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                lineHeight: 1
+            }}>{emoji}</span>
         </Circle>
         </Box>
     )
