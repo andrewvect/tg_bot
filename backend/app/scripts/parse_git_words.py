@@ -15,11 +15,22 @@ logger = setup_logger(__name__)
 
 
 class GitWordParser:
+    files = ["1-1000.yaml", "1001-2000.yaml", "2001-3000.yaml", "3001-3786.yaml"]
+
     def __init__(self, config: Settings):
-        self.url_to_git_file = config.URL_TO_GIT_FILE
+        self.url_to_git_file = config.URL_TO_GIT_FILES
 
     def get_words_from_git(self):
-        words = requests.get(self.url_to_git_file).text
+        words = ""
+        for file in self.files:
+            url = f"{self.url_to_git_file}{file}"
+            response = requests.get(url, timeout=30)
+            if response.status_code == 200:
+                words += response.text
+            else:
+                logger.error(
+                    f"Failed to fetch {file}, status code: {response.status_code}"
+                )
         return words
 
     def create_db_connection(self) -> sessionmaker:
@@ -82,9 +93,16 @@ class GitWordParser:
 
                         # Process each sentence from git data
                         for sentence_data in item["sentences"]:
-                            latin_text = sentence_data["Latin"]
-                            cyrillic_text = sentence_data["Cyrillic"]
-                            native_text = sentence_data["Russian"]
+                            try:
+                                latin_text = sentence_data["Latin"]
+
+                                cyrillic_text = sentence_data["Cyrillic"]
+                                native_text = sentence_data["Russian"]
+                            except TypeError:
+                                print(
+                                    f"Error processing sentence data: {sentence_data}"
+                                )
+                                break
 
                             if latin_text in existing_sentences:
                                 # Update existing sentence if needed
