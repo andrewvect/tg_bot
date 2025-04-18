@@ -16,7 +16,11 @@ router = Router()
 
 
 def load_content() -> dict:
-    content_path = Path(__file__).parents[3] / "content.yaml"
+    # Use absolute path for Docker compatibility
+    content_path = Path("/app/content.yaml")
+    if not content_path.exists():
+        # fallback for local dev
+        content_path = Path(__file__).parents[3] / "content.yaml"
     with open(content_path, encoding="utf-8") as file:
         return yaml.safe_load(file) or {}
 
