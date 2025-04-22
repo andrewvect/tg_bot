@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import yaml
@@ -27,6 +28,21 @@ def load_content() -> dict:
 
 content = load_content()
 messages = content.get("messages", {})
+
+
+def markdown_to_html(text: str) -> str:
+    """
+    Convert Markdown-style formatting to HTML for Telegram.
+    - **bold** becomes <b>bold</b>
+    - [link text](url) becomes <a href="url">link text</a>
+    """
+    # Convert bold text: **text** -> <b>text</b>
+    text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", text)
+
+    # Convert links: [text](url) -> <a href="url">text</a>
+    text = re.sub(r"\[(.*?)\]\((.*?)\)", r'<a href="\2">\1</a>', text)
+
+    return text
 
 
 @router.message(Command("start"))
@@ -59,5 +75,12 @@ async def start_command(message: Message) -> None:
 @router.message(Command("help"))
 async def help_command(message: Message) -> None:
     """Send a message when the command /help is issued."""
-    help_text = messages.get("help", "Help information not available.")
-    await message.reply(help_text)
+    help_sections = messages.get("help", {})
+
+    # Send each help section as a separate message
+    for section_name in ["intro", "usage", "features", "levels", "mot", "feedback"]:
+        section_text = help_sections.get(section_name, "")
+        if section_text:
+            # Convert markdown formatting to HTML
+            html_text = markdown_to_html(section_text)
+            await message.answer(html_text, parse_mode="HTML")
