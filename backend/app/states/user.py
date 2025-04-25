@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from sortedcontainers import SortedDict, SortedList
 
-from app.api.deps import get_session
+from app.api.deps import async_session_factory
 from app.common.cache.states import UserProfile, users_states
 from app.common.db import Database
 from app.common.db.models.card import Card
@@ -105,16 +105,15 @@ class StatesCreator:
 
 
 async def build_user_state() -> StatesCreator:
-    session = await anext(get_session())
-    db = Database(session=session)
-    states_creator = StatesCreator(db, review_algorithm, cache=users_states)
-    return states_creator
+    async with async_session_factory() as session:
+        db = Database(session=session)
+        states_creator = StatesCreator(db, review_algorithm, cache=users_states)
+        return states_creator
 
 
 async def get_users_states() -> dict[int, UserProfile]:
     """Return users states"""
-
-    session = await anext(get_session())
-    db = Database(session=session)
-    states_creator = StatesCreator(db, review_algorithm, cache=users_states)
-    return await states_creator.create_states()
+    async with async_session_factory() as session:
+        db = Database(session=session)
+        states_creator = StatesCreator(db, review_algorithm, cache=users_states)
+        return await states_creator.create_states()
