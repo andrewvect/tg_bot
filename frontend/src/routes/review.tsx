@@ -148,11 +148,13 @@ function ReviewWords({ reviewWordsCount, setCount, setLoading, setRefreshKey, pr
                     setDisplayWord(originalTranslation);
                     setDisplayTranslation(originalWord  ?? '');
                     setFlag('🇷🇺');
+                    setAlphabet('')
                 } else if (spoilerSettings === 3) {
                     if (Math.random() < 0.5) {
                         setDisplayWord(originalTranslation);
                         setDisplayTranslation(originalWord  ?? '');
                         setFlag('🇷🇺');
+                        setAlphabet('')
                     } else {
                         setDisplayWord(originalWord ?? '');
                         setDisplayTranslation(originalTranslation);
