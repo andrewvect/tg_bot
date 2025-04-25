@@ -6,7 +6,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-from app.api.deps import get_session
+from app.api.deps import async_session_factory
 from app.common.db.repositories import SettingsRepo, UserRepo
 from app.common.db.repositories.user import NewUser
 from app.states.user import build_user_state
@@ -48,28 +48,28 @@ def markdown_to_html(text: str) -> str:
 @router.message(Command("start"))
 async def start_command(message: Message) -> None:
     """Send a message when the command /start is issued."""
-    session = await anext(get_session())
-    user_repo = UserRepo(session=session)
-    settings_repo = SettingsRepo(session=session)
-    try:
-        await user_repo.create(
-            user_name=message.from_user.username, telegram_id=message.from_user.id
-        )
-    except NewUser:
-        await settings_repo.create_or_update_settings(user_id=message.from_user.id)
-        await message.reply(
-            messages.get("start", {})
-            .get("new_user", "")
-            .format(username=message.from_user.username)
-        )
-        states = await build_user_state()
-        states.add_new_user(user_id=message.from_user.id)
-    else:
-        await message.reply(
-            messages.get("start", {})
-            .get("returning_user", "")
-            .format(username=message.from_user.username)
-        )
+    async with async_session_factory() as session:
+        user_repo = UserRepo(session=session)
+        settings_repo = SettingsRepo(session=session)
+        try:
+            await user_repo.create(
+                user_name=message.from_user.username, telegram_id=message.from_user.id
+            )
+        except NewUser:
+            await settings_repo.create_or_update_settings(user_id=message.from_user.id)
+            await message.reply(
+                messages.get("start", {})
+                .get("new_user", "")
+                .format(username=message.from_user.username)
+            )
+            states = await build_user_state()
+            states.add_new_user(user_id=message.from_user.id)
+        else:
+            await message.reply(
+                messages.get("start", {})
+                .get("returning_user", "")
+                .format(username=message.from_user.username)
+            )
 
 
 @router.message(Command("help"))
