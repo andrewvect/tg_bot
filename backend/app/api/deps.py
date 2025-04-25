@@ -9,8 +9,7 @@ from fastapi.security import (
     HTTPBearer,
     OAuth2PasswordBearer,
 )
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.common.cache import users_states
 from app.common.db import Database
@@ -32,20 +31,14 @@ engine = create_async_engine(
     max_overflow=20,
 )
 
-async_session_factory = sessionmaker(
+async_session_factory = async_sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
 )
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    session = async_session_factory()
-    try:
+    async with AsyncSession(bind=engine) as session:
         yield session
-    finally:
-        try:
-            await session.close()
-        except Exception:
-            pass
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
