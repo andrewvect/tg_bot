@@ -53,7 +53,7 @@ def setup_logger(name: str = __name__, level: int = logging.INFO) -> logging.Log
         logger.addHandler(console_handler)
 
         # Add file logging in production environment
-        if settings.ENVIRONMENT == "production":
+        if settings.ENVIRONMENT in ["production", "local"]:
             # Create logs directory if it doesn't exist
             log_dir = os.path.join(
                 os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "logs"
