@@ -58,6 +58,25 @@ async def start_command(message: Message) -> None:
                 user_name=message.from_user.username, telegram_id=message.from_user.id
             )
         except NewUser:
+            logger.info(
+                "User %s with ID %s registered",
+                message.from_user.username,
+                message.from_user.id,
+            )
+            # Notify admin about the new user registration
+
+            if settings.ADMIN_TG_ID:
+                admin_id = settings.ADMIN_TG_ID
+                await message.bot.send_message(
+                    admin_id,
+                    messages.get("admin", {})
+                    .get("new_user_registered", "")
+                    .format(
+                        username=message.from_user.username,
+                        user_id=message.from_user.id,
+                        user_url=f"tg://user?id={message.from_user.id}",
+                    ),
+                )
             await settings_repo.create_or_update_settings(user_id=message.from_user.id)
             await message.reply(
                 messages.get("start", {})
