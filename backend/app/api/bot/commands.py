@@ -9,6 +9,7 @@ from aiogram.types import Message
 from app.api.deps import async_session_factory
 from app.common.db.repositories import SettingsRepo, UserRepo
 from app.common.db.repositories.user import NewUser
+from app.core.config import settings
 from app.states.user import build_user_state
 from app.utils.logger import logger
 
@@ -62,6 +63,20 @@ async def start_command(message: Message) -> None:
                 message.from_user.username,
                 message.from_user.id,
             )
+            # Notify admin about the new user registration
+
+            if settings.ADMIN_TG_ID:
+                admin_id = settings.ADMIN_TG_ID
+                await message.bot.send_message(
+                    admin_id,
+                    messages.get("admin", {})
+                    .get("new_user_registered", "")
+                    .format(
+                        username=message.from_user.username,
+                        user_id=message.from_user.id,
+                        user_url=f"tg://user?id={message.from_user.id}",
+                    ),
+                )
             await settings_repo.create_or_update_settings(user_id=message.from_user.id)
             await message.reply(
                 messages.get("start", {})
