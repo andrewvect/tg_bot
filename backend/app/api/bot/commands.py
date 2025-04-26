@@ -69,13 +69,9 @@ async def start_command(message: Message) -> None:
                 admin_id = settings.ADMIN_TG_ID
                 await message.bot.send_message(
                     admin_id,
-                    messages.get("admin", {})
-                    .get("new_user_registered", "")
-                    .format(
-                        username=message.from_user.username,
-                        user_id=message.from_user.id,
-                        user_url=f"tg://user?id={message.from_user.id}",
-                    ),
+                    f"New user registered: @{message.from_user.username} (ID: {message.from_user.id}). "
+                    f"Contact: <a href='tg://user?id={message.from_user.id}'>Open chat</a>",
+                    parse_mode="HTML",
                 )
             await settings_repo.create_or_update_settings(user_id=message.from_user.id)
             await message.reply(
