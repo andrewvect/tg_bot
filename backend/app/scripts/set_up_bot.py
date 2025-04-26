@@ -5,9 +5,10 @@ from aiogram.client.telegram import TEST
 from aiogram.types import MenuButtonWebApp, WebAppInfo  # added missing imports
 
 from app.core.config import settings
-from app.utils.logger import logger
+from app.utils.logger import setup_logger
 
 """Script to set and delete Telegram webhook for the bot before star app."""
+logger = setup_logger(__name__)
 
 
 async def delete_telegram_webhook(bot) -> bool:
@@ -40,6 +41,32 @@ async def set_telegram_webhook(bot: Bot) -> bool:
 
 
 async def set_telegram_web_app_url(bot: Bot):
+    """Set up button inside chat"""
+    try:
+        if settings.ENVIRONMENT == "local":
+            protocol = "http"
+        else:
+            protocol = "https"
+
+        menu_button = MenuButtonWebApp(
+            text="Открыть приложение",
+            web_app=WebAppInfo(
+                url=f"{protocol}://" + "dashboard." + settings.DOMAIN + "/auth"
+            ),
+        )
+        result = await bot.set_chat_menu_button(menu_button=menu_button)
+        if result:
+            logger.info("Telegram web app URL set successfully")
+
+        else:
+            logger.error("Failed to set Telegram web app URL")
+    except Exception:
+        logger.exception("Error while setting Telegram web app URL")
+    return False
+
+
+async def set_telegram_web_app_mini_url(bot: Bot):
+    """Set up button in list of chats"""
     try:
         if settings.ENVIRONMENT == "local":
             protocol = "http"
