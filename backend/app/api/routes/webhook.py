@@ -24,7 +24,6 @@ class TransferData(TypedDict):
     role: int
 
 
-@router.post("")
 @router.post("/")
 async def webhook(request: Request) -> Response:
     """Handle incoming updates from Telegram bot.
@@ -42,22 +41,25 @@ async def webhook(request: Request) -> Response:
     if settings.ENVIRONMENT == "local":
         # For local testing, set the bot to TEST mode
         bot.session.api = TEST
-
-    await dispatcher.feed_update(
-        update=update,
-        bot=bot,
-        config=settings,
-        **TransferData(
-            logger=logger,
-            engine=create_async_engine(
-                url=settings.ASYNC_SQLALCHEMY_DATABASE_URI,
-                pool_size=10,
-                max_overflow=5,
-                pool_timeout=30,
-                pool_recycle=1800,
+    try:
+        await dispatcher.feed_update(
+            update=update,
+            bot=bot,
+            config=settings,
+            **TransferData(
+                logger=logger,
+                engine=create_async_engine(
+                    url=settings.ASYNC_SQLALCHEMY_DATABASE_URI,
+                    pool_size=10,
+                    max_overflow=5,
+                    pool_timeout=30,
+                    pool_recycle=1800,
+                ),
             ),
-        ),
-        redis_url="",
-    )
+            redis_url="",
+        )
 
-    return Response(status_code=200)
+        return Response(status_code=200)
+    except Exception as e:
+        logger.error(f"Error processing update: {e}")
+        return Response(status_code=200)
