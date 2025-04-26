@@ -138,13 +138,13 @@ class Settings(BaseSettings):
             "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD
         )
 
-        # Only require BOT_TOKEN and URL_TO_GIT_FILE in non-local environments
+        # Only require BOT_TOKEN and URL_TO_GIT_FILES in non-local environments
         if self.ENVIRONMENT != "local":
             if not self.BOT_TOKEN:
                 raise ValueError("BOT_TOKEN must be set in non-local environments")
-            if not self.URL_TO_GIT_FILE:
+            if not self.URL_TO_GIT_FILES:
                 raise ValueError(
-                    "URL_TO_GIT_FILE must be set in non-local environments"
+                    "URL_TO_GIT_FILES must be set in non-local environments"
                 )
         return self
 
