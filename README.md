@@ -4,6 +4,15 @@
 
 A modern web application built with FastAPI backend and React frontend. This project combines a Telegram bot with an embedded web application designed to help users efficiently learn new words and expand their vocabulary. The system features user progress tracking, personalized learning paths, and intuitive word management, all accessible through the Telegram interface Web App.
 
+## Images of application
+<p align="center">
+    <img src="diagrams/1.jpeg" alt="Web App" width="20%" />
+    <img src="diagrams/2.jpeg" alt="Web App" width="20%" />
+    <img src="diagrams/3.jpeg" alt="Web App" width="20%" />
+    <img src="diagrams/4.jpeg" alt="Web App" width="20%" />
+    <img src="diagrams/5.jpeg" alt="Web App" width="20%" />
+</p>
+
 ## Technology Stack and Features
 
 ### Backend
