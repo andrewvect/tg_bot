@@ -2,7 +2,7 @@
 
 # WordGram - Language Learning Telegram Bot
 
-A modern web application built with FastAPI backend and React frontend. This project combines a Telegram bot with an embedded web application designed to help users efficiently learn new words and expand their vocabulary. The system features user progress tracking, personalized learning paths, and intuitive word management, all accessible through the Telegram interface Web App.
+A modern web application built with a FastAPI backend and React frontend. This project combines a Telegram bot with an embedded web application designed to help users efficiently learn new words and expand their vocabulary. The system features user progress tracking, and intuitive word management, all accessible through the Telegram interface Web App. The app utilizes a spaced repetition algorithm to optimize the learning process and improve long-term retention of vocabulary.
 
 ## Images of application
 <p align="center">
