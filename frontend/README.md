@@ -122,10 +122,8 @@ Then, when you run the frontend, it will use that URL as the base URL for the AP
 The frontend code is structured as follows:
 
 * `frontend/src` - The main frontend code.
-* `frontend/src/assets` - Static assets.
 * `frontend/src/client` - The generated OpenAPI client.
 * `frontend/src/components` -  The different components of the frontend.
-* `frontend/src/hooks` - Custom hooks.
 * `frontend/src/routes` - The different routes of the frontend which include the pages.
 * `theme.tsx` - The Chakra UI custom theme.
 
