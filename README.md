@@ -31,9 +31,17 @@ A modern web application built with FastAPI backend and React frontend. This pro
 - 🚢 Deployment instructions using Docker Compose, including how to set up a frontend Traefik proxy to handle automatic HTTPS certificates.
 - 📱 [Telegram API](https://core.telegram.org/bots/api) integration
 
+Services architecture visualization:
+![Architecture](diagrams/architecture.svg)
+
 ## How To Use It or Run Locally
 
+### Prerequisites
 
+Before running the application, ensure you have the following installed:
+- Python 3.8 or higher
+- Node.js and npm
+- Docker and Docker Compose
 
 ### Configure
 
@@ -56,4 +64,3 @@ Deployment docs: [deployment.md](./deployment.md).
 General development docs: [development.md](./development.md).
 
 This includes using Docker Compose, custom local domains, `.env` configurations, etc.
-
