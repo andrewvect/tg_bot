@@ -30,8 +30,6 @@ jobs:
       #   run: uv run bash scripts/prestart.sh
       #   working-directory: backend
       - name: Run tests
-        env:
-          URL_TO_GIT_FILES: ${{ secrets.URL_TO_GIT_FILES }}
         run: uv run bash scripts/tests-start.sh "Coverage for ${{ github.sha }}"
         working-directory: backend
       - run: docker compose down -v --remove-orphans
