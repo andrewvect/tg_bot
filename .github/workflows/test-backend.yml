@@ -26,9 +26,9 @@ jobs:
           enable-cache: true
       - run: docker compose down -v --remove-orphans
       - run: docker compose up -d db mailcatcher
-      - name: Migrate DB
-        run: uv run bash scripts/prestart.sh
-        working-directory: backend
+      # - name: Migrate DB
+      #   run: uv run bash scripts/prestart.sh
+      #   working-directory: backend
       - name: Run tests
         env:
           URL_TO_GIT_FILES: ${{ secrets.URL_TO_GIT_FILES }}
