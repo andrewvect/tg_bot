@@ -5,7 +5,11 @@ repos:
     rev: v4.4.0
     hooks:
       - id: check-added-large-files
-        exclude: .*\.svg$
+        exclude: >
+          (?x)^(
+              .*\.svg$|
+              .*\.drawio$
+          )
       - id: check-toml
       - id: check-yaml
         args:
