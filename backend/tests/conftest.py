@@ -35,6 +35,34 @@ def test_app(override_settings):  # noqa F811
     return create_app()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def create_test_db():  # noqa F811
+    """Create the test database using SQLAlchemy."""
+
+    from sqlalchemy.engine.url import make_url
+
+    url = make_url(str(settings.SQLALCHEMY_DATABASE_URI))
+    url = url.set(database="postgres")
+    engine = create_engine(url, pool_pre_ping=True)
+
+    # Create a connection to the default database
+    from sqlalchemy.sql import text
+
+    with engine.connect() as conn:
+        conn.execution_options(isolation_level="AUTOCOMMIT")
+        # Drop the test database if it exists
+        conn.execute(text(f"DROP DATABASE IF EXISTS {TEST_DB_NAME}"))
+        # Create the test database
+        conn.execute(text(f"CREATE DATABASE {TEST_DB_NAME}"))
+
+    yield
+
+    # Cleanup: Drop the test database after tests
+    with engine.connect() as conn:
+        conn.execution_options(isolation_level="AUTOCOMMIT")
+        conn.execute(text(f"DROP DATABASE IF EXISTS {TEST_DB_NAME}"))
+
+
 @pytest.fixture(scope="session")
 def engine(override_settings):  # noqa F811
     # Create a synchronous engine instead of async
