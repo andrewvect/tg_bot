@@ -40,6 +40,7 @@ jobs:
       env:
         VIRTUAL_ENV: backend/.venv
         ENVIRONMENT: production
+        BOT_TOKEN: some_token
         SECRET_KEY: just-for-generating-client
         POSTGRES_PASSWORD: just-for-generating-client
         FIRST_SUPERUSER_PASSWORD: just-for-generating-client
