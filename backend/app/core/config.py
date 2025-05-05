@@ -139,13 +139,6 @@ class Settings(BaseSettings):
         )
 
         # Only require BOT_TOKEN and URL_TO_GIT_FILES in non-local environments
-        if self.ENVIRONMENT != "local":
-            if not self.BOT_TOKEN:
-                raise ValueError("BOT_TOKEN must be set in non-local environments")
-            if not self.URL_TO_GIT_FILES:
-                raise ValueError(
-                    "URL_TO_GIT_FILES must be set in non-local environments"
-                )
         return self
 
 
