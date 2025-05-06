@@ -1,6 +1,7 @@
 name: Add to Project
 
 on:
+  workflow_dispatch:
   pull_request_target:
   issues:
     types:
