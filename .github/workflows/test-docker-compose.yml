@@ -27,7 +27,19 @@ jobs:
         if: failure()
         run: docker compose logs backend
       - name: Test backend is up
-        run: curl http://localhost:8000/api/v1/utils/        sudo chmod -R 775 "/Users/andrey/Library/Application Support/virtualenv/py_info"
+        run: curl http://localhost:8000/api/v1/utils/health-check/
       - name: Test frontend is up
         run: curl http://localhost:5173
+      - name: Show frontend logs if unhealthy
+        if: failure()
+        run: docker compose logs frontend
+      - name: Show backend logs if unhealthy
+        if: failure()
+        run: docker compose logs backend
+      - name: Show frontend logs if unhealthy
+        if: failure()
+        run: docker compose logs frontend
+      - name: Show backend logs if unhealthy
+        if: failure()
+        run: docker compose logs backend
       - run: docker compose down -v --remove-orphans
