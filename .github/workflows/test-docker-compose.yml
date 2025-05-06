@@ -20,6 +20,9 @@ jobs:
       - run: docker compose build
       - run: docker compose down -v --remove-orphans
       - run: docker compose up -d --wait backend frontend adminer
+      - name: Show backend logs if unhealthy
+        if: failure()
+        run: docker compose logs backend
       - name: Test backend is up
         run: curl http://localhost:8000/api/v1/utils/        sudo chmod -R 775 "/Users/andrey/Library/Application Support/virtualenv/py_info"
       - name: Test frontend is up

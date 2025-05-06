@@ -1,9 +1,10 @@
 """Main FastAPI application."""
 
 from contextlib import asynccontextmanager
+from typing import Any
 
 import sentry_sdk
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
@@ -16,11 +17,10 @@ from app.utils.logger import logger
 
 
 @asynccontextmanager
-async def set_up(app):  # noqa
+async def set_up(app: FastAPI) -> None:  # noqa
     """Set up user states."""
     await set_telegram_bot(mode=settings.ENVIRONMENT)
-    global users_states
-    users_states = await get_users_states()
+    await get_users_states()
     yield
 
 
@@ -41,7 +41,7 @@ def create_app() -> FastAPI:
     )
 
     # Add this function to customize the OpenAPI schema with security
-    def custom_openapi():
+    def custom_openapi() -> dict[str, Any] | None:
         if app.openapi_schema:
             return app.openapi_schema
 
@@ -74,7 +74,7 @@ def create_app() -> FastAPI:
     app.openapi = custom_openapi
 
     @app.exception_handler(Exception)
-    async def generic_exception(request, exc):
+    async def generic_exception(request: Request, exc: Exception):
         """Handle exceptions globally."""
         logger.error(
             "Unhandled error: %s %s %s %s",
