@@ -90,9 +90,9 @@ async def set_telegram_web_app_mini_url(bot: Bot):
     return False
 
 
-async def set_up_bot(mode):
+async def set_up_bot(mode: str) -> None:
+    bot = Bot(token=settings.BOT_TOKEN)
     try:
-        bot = Bot(token=settings.BOT_TOKEN)
         if mode == "local":
             bot.session.api = TEST
 
