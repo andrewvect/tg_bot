@@ -82,7 +82,7 @@ class StatisticsRepo(Repository[Statistic]):
 
         return user_stats
 
-    async def get_statistic(self, user_id: int) -> Statistic | None:
+    async def get_statistic(self, user_id: int) -> Statistic:
         """
         Get the Statistic for the given user.
 
@@ -90,11 +90,25 @@ class StatisticsRepo(Repository[Statistic]):
             user_id (int): The user's unique identifier.
 
         Returns:
-            Optional[Statistic]: The user's statistic, or None if not found.
+            Statistic: The user's statistic.
         """
         result = await self.get_by_condition(
             condition=self.type_model.user_id == user_id
         )
+
+        if result is None:
+            await self.initialize_statistic(user_id)
+            result = await self.get_by_condition(
+                condition=self.type_model.user_id == user_id
+            )
+
+            # If we still don't have a result after initialization, create one directly
+            if result is None:
+                result = Statistic(user_id=user_id)
+                self._session.add(result)
+                await self._session.commit()
+                # After adding and committing, we return the created object
+
         return result
 
     async def get_created_cards_today(self, user_id: int) -> int:
@@ -108,9 +122,6 @@ class StatisticsRepo(Repository[Statistic]):
             int: The number of cards created today, or 0 if none found.
         """
         user_stats = await self.get_statistic(user_id)
-
-        if user_stats is None:
-            return 0
 
         created_cards = user_stats.create_card
         current_date = str(date.today())
