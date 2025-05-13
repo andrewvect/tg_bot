@@ -9,7 +9,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 WORDS_YAML_PATH = os.path.join(SCRIPT_DIR, "words.yaml")
 
 
-def extract_word_from_sentences(sentences):
+def extract_word_from_sentences(sentences: list[dict[str, str]]) -> str | None:
     """Extract words between ** symbols from Cyrillic sentences."""
     for sentence in sentences:
         if "Cyrillic" in sentence:
@@ -21,7 +21,7 @@ def extract_word_from_sentences(sentences):
     return None
 
 
-def fill_empty_cyrillic_fields():
+def fill_empty_cyrillic_fields() -> None:
     # Load the YAML file
     with open(WORDS_YAML_PATH, encoding="utf-8") as file:
         words_data = yaml.safe_load(file)
