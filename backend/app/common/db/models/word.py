@@ -1,12 +1,14 @@
 """Word model file."""
-
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from .card import Card
-from .sentence import Sentence
+
+if TYPE_CHECKING:
+    from .card import Card  # noqa: F401
+    from .sentence import Sentence  # noqa: F401
 
 
 class Word(Base):
@@ -21,13 +23,13 @@ class Word(Base):
     native_word: Mapped[str] = mapped_column(String(100), nullable=False)
     """The native word (translated version)."""
 
-    cyrillic_word: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    cyrillic_word: Mapped[str] = mapped_column(String(100), nullable=True)
     """The Cyrillic word (translated version)."""
 
     image: Mapped[str | None] = mapped_column(String, nullable=True)
     """Optional image associated with the word."""
 
-    legend: Mapped[str | None] = mapped_column(String, nullable=True)
+    legend: Mapped[str] = mapped_column(String, nullable=True)
     """Optional legend for the word."""
 
     transcription: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -47,8 +49,8 @@ class Word(Base):
     )
     """Related card that includes this word."""
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.latin_word} ({self.native_word})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Word(id={self.id}, foreign_word={self.latin_word}, native_word={self.native_word})>"
