@@ -24,7 +24,11 @@ class CardRepo(Repository[Card]):
         super().__init__(type_model=Card, session=session)
 
     async def create_card(
-        self, user_id, count_of_views, word_id, last_view: datetime.datetime = None
+        self,
+        user_id: int,
+        count_of_views: int,
+        word_id: int,
+        last_view: datetime.datetime | None = None,
     ) -> Card:
         """Insert a new user card into the database."""
         if last_view is None:
@@ -42,11 +46,12 @@ class CardRepo(Repository[Card]):
 
     async def add_review(self, user_id: int, word_id: int) -> Card:
         """Add a review for a word."""
-        print(user_id, word_id)
-        card = await self.session.execute(
+        result = await self.session.execute(
             select(Card).filter(Card.user_id == user_id, Card.word_id == word_id)
         )
-        card = card.scalars().first()
+        card = result.scalars().first()
+        if card is None:
+            raise NoCards("No card found for the specified user and word")
         card.count_of_views += 1
         await self.session.commit()
         return card
