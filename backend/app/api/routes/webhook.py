@@ -21,6 +21,7 @@ class TransferData(TypedDict):
     # admin: AdminEntity
     engine: AsyncEngine
     redis_url: str
+    logger: object
     role: int
 
 
@@ -55,8 +56,9 @@ async def webhook(request: Request) -> Response:
                     pool_timeout=30,
                     pool_recycle=1800,
                 ),
+                redis_url="redis://localhost:6379/0",  # Providing a value for redis_url
+                role=0,  # Providing a default value for role
             ),
-            redis_url="",
         )
 
         return Response(status_code=200)
