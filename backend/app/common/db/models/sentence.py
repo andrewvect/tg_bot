@@ -1,7 +1,12 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .word import Word  # noqa: F401
 
 
 class Sentence(Base):
@@ -28,7 +33,7 @@ class Sentence(Base):
     )
     """ Relationship to the Word model """
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"{self.native_text} "
             f"- "
@@ -37,7 +42,7 @@ class Sentence(Base):
             f"{self.latin_text}"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"<Sentence("
             f"id={self.id}, "
