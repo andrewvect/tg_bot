@@ -5,7 +5,6 @@ from pydantic import (
     AnyUrl,
     BeforeValidator,
     HttpUrl,
-    PostgresDsn,
     computed_field,
     model_validator,
 )
@@ -29,7 +28,6 @@ class Settings(BaseSettings):
         env_ignore_empty=True,
         extra="ignore",
     )
-    DOMAIN: str
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
@@ -58,7 +56,7 @@ class Settings(BaseSettings):
 
     @computed_field  # type: ignore[prop-decorator]
     @property
-    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
+    def SQLALCHEMY_DATABASE_URI(self) -> str:
         return str(
             MultiHostUrl.build(
                 scheme="postgresql+psycopg",
@@ -102,7 +100,7 @@ class Settings(BaseSettings):
 
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
 
-    BOT_TOKEN: str | None = None
+    BOT_TOKEN: str
     URL_TO_GIT_FILES: AnyUrl | None = None
 
     @computed_field  # type: ignore[prop-decorator]
