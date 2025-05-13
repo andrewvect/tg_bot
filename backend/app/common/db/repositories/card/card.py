@@ -1,10 +1,13 @@
 import datetime
+from collections.abc import Sequence
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.backend.common.services.exceptions import NoCards
 
-from ..models.card import Card
-from .abstract import Repository
+from app.common.db.repositories.card.card_creator import NoCards
+
+from ...models.card import Card
+from ..abstract import Repository
 
 
 class CardRepo(Repository[Card]):
@@ -12,7 +15,11 @@ class CardRepo(Repository[Card]):
         super().__init__(type_model=Card, session=session)
 
     async def create(
-        self, user_id: int, count_of_views: int, word_id: int, last_view=None
+        self,
+        user_id: int,
+        count_of_views: int,
+        word_id: int,
+        last_view: datetime.datetime | None = None,
     ) -> Card:
         """Insert a new user card into the database."""
         if last_view is None:
@@ -27,10 +34,15 @@ class CardRepo(Repository[Card]):
         await self.session.commit()
         return card
 
-    async def get_many(self, whereclause, limit=100, order_by=None) -> list[Card]:
+    async def get_many(
+        self,
+        condition: Any,
+        limit: int = 100,
+        order_by: Any = None,
+        options: list[Any] | None = None,
+    ) -> Sequence[Card]:
         """Get all cards from the database."""
-
-        resutl = await super().get_many(whereclause, limit, order_by)
-        if resutl is None:
+        result = await super().get_many(condition, limit, order_by, options)
+        if result is None:
             raise NoCards
-        return resutl
+        return result
