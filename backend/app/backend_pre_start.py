@@ -1,9 +1,10 @@
 """Module to check if the database is awake before starting the service."""
 
+import asyncio
 import logging
 
-from sqlalchemy import Engine, text
-from sqlalchemy.orm import Session
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
 from app.core.db import engine
@@ -21,12 +22,12 @@ wait_seconds = 1
     before=before_log(logger, logging.INFO),
     after=after_log(logger, logging.WARN),
 )
-def init(db_engine: Engine) -> None:
+async def init(db_engine: AsyncEngine) -> None:
     try:
-        with Session(db_engine) as session:
-            # Try to create session to check if DB is awake
-            session.execute(text("SELECT 1"))
-            session.commit()
+        # Try to create session to check if DB is awake
+        async with db_engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+            await conn.commit()
     except Exception as e:
         logger.error(e)
         raise e
@@ -34,7 +35,7 @@ def init(db_engine: Engine) -> None:
 
 def main() -> None:
     logger.info("Initializing service")
-    init(engine)
+    asyncio.run(init(engine))
     logger.info("Service finished initializing")
 
 
