@@ -25,15 +25,15 @@ class Database:
     def __init__(
         self,
         session: AsyncSession,
-        user: UserRepo = None,
-        card: CardRepo = None,
-        word: WordRepo = None,
-        sentence: SentenceRepo = None,
-        settings: SettingsRepo = None,
-        statistic: StatisticsRepo = None,
-        invoice: InvoiceRepo = None,
-        texts: TextsRepo = None,
-        user_text: UserTextRepo = None,
+        user: UserRepo | None = None,
+        card: CardRepo | None = None,
+        word: WordRepo | None = None,
+        sentence: SentenceRepo | None = None,
+        settings: SettingsRepo | None = None,
+        statistic: StatisticsRepo | None = None,
+        invoice: InvoiceRepo | None = None,
+        texts: TextsRepo | None = None,
+        user_text: UserTextRepo | None = None,
     ):
         """Init database."""
         self.session = session
