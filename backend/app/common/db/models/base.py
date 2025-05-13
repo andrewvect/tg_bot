@@ -1,6 +1,6 @@
 from sqlalchemy import Integer, MetaData
-from sqlalchemy.ext.declarative import as_declarative
 from sqlalchemy.orm import Mapped, declared_attr, mapped_column
+from sqlalchemy.orm.decl_api import DeclarativeBase
 
 metadata = MetaData(
     naming_convention={
@@ -13,13 +13,15 @@ metadata = MetaData(
 )
 
 
-@as_declarative(metadata=metadata)
-class Base:
-    @classmethod
-    @declared_attr
-    def __tablename__(cls):
+class Base(DeclarativeBase):
+    # Remove the classmethod as it's not needed with declared_attr
+    @declared_attr.directive
+    def __tablename__(cls) -> str:
         return cls.__name__.lower()
 
     __allow_unmapped__ = False
 
     id: Mapped[int] = mapped_column(Integer, autoincrement=True, primary_key=True)
+
+
+Base.metadata = metadata
