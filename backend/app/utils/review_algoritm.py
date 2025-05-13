@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 def review_algorithm(
     checks: int,
     passed: bool = True,
-    review_date: datetime = None,
+    review_date: datetime | None = None,
 ) -> int:
     """
     Determines the next review date based on the number of checks and whether the last review was passed.
