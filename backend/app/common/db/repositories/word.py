@@ -18,8 +18,8 @@ This module handles the repository functionality for managing `Word` entities.
 class WordData:
     native_word: str
     foreign_word: str
-    image: str = None
-    cyrillic_representation: str = None
+    image: str | None = None
+    cyrillic_representation: str | None = None
 
 
 class WordRepo(Repository[Word]):
@@ -73,4 +73,4 @@ class WordRepo(Repository[Word]):
             .order_by(Word.id)
             .limit(limit)
         )
-        return query.unique().scalars().all()
+        return list(query.unique().scalars().all())
