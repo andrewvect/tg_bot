@@ -20,8 +20,8 @@ class Level(Base):
 
     __table_args__ = (CheckConstraint("level >= 0", name="check_level_positive"),)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.title} ({self.level})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Level(level={self.level}, title={self.title})>"
