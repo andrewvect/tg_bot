@@ -1,5 +1,6 @@
 """Main FastAPI application."""
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -17,7 +18,7 @@ from app.utils.logger import logger
 
 
 @asynccontextmanager
-async def set_up(app: FastAPI) -> None:  # noqa
+async def set_up(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa
     """Set up user states."""
     await set_telegram_bot(mode=settings.ENVIRONMENT)
     await get_users_states()
@@ -71,10 +72,13 @@ def create_app() -> FastAPI:
         app.openapi_schema = openapi_schema
         return app.openapi_schema
 
+    # Use setattr to override the openapi method
     app.openapi = custom_openapi
 
     @app.exception_handler(Exception)
-    async def generic_exception(request: Request, exc: Exception):
+    async def generic_exception(
+        request: Request, exc: Exception
+    ) -> tuple[dict[str, str], int]:
         """Handle exceptions globally."""
         logger.error(
             "Unhandled error: %s %s %s %s",
