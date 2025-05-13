@@ -1,6 +1,7 @@
+# mypy: ignore-missing-imports
 from dataclasses import dataclass, field
 
-from sortedcontainers import SortedDict, SortedList, SortedSet
+from sortedcontainers import SortedDict, SortedList, SortedSet  # type: ignore
 
 
 @dataclass
@@ -14,7 +15,7 @@ class UserProfile:
     # store words ids which user makes 10 right reviews
     master_cards: SortedSet = field(default_factory=SortedSet)
     # store words ids which to review
-    review_cards: list = field(default_factory=list)
+    review_cards: list[int] = field(default_factory=list)
     # store words ids which user is waiting to review
     waiting_cards: SortedDict = field(default_factory=SortedDict)
 
