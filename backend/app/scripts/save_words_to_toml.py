@@ -1,7 +1,7 @@
 import yaml
 
 
-def create_yaml_from_words(input_file, output_file):
+def create_yaml_from_words(input_file: str, output_file: str) -> None:
     words = {}
     with open(input_file, encoding="utf-8") as f:
         for i, line in enumerate(f):
