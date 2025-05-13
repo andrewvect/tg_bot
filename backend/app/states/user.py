@@ -1,6 +1,7 @@
+from collections.abc import Callable, Sequence
 from datetime import datetime, timedelta
 
-from sortedcontainers import SortedDict, SortedList
+from sortedcontainers import SortedDict, SortedList  # type: ignore
 
 from app.api.deps import async_session_factory
 from app.common.cache.states import UserProfile, users_states
@@ -43,10 +44,15 @@ def review_algorithm(
 class StatesCreator:
     """Class create users states after app start and fill cache"""
 
-    def __init__(self, db: Database, review_algorithm: callable, cache: dict):
+    def __init__(
+        self,
+        db: Database,
+        review_func: Callable[[datetime, int, bool], datetime],
+        cache: dict[int, UserProfile],
+    ) -> None:
         self.cache = cache
         self.db = db
-        self.review_algorithm = review_algorithm
+        self.review_algorithm = review_func
 
     async def create_states(self) -> dict[int, UserProfile]:
         try:
@@ -71,34 +77,39 @@ class StatesCreator:
             self.cache[telegram_id] = user_state
         return self.cache
 
-    def _fill_created_cards(self, cards: list[Card]) -> SortedList[int]:
+    def _fill_created_cards(self, cards: Sequence[Card]) -> SortedList[int]:
         created_cards = SortedList()
         for card in cards:
             created_cards.add(card.word_id)
         return created_cards
 
     def _fill_review_waiting_cards(
-        self, cards: list[Card]
+        self, cards: Sequence[Card]
     ) -> tuple[list[int], SortedDict[int, int]]:
         cards_to_review = []
         waiting_cards = SortedDict()
         for card in cards:
             current_time = datetime.now()
-            review_date = self.review_algorithm(card.last_view, card.count_of_views)
+            # Convert SQLAlchemy's DateTime to Python's datetime
+            last_view_datetime = card.last_view
+            if isinstance(last_view_datetime, datetime):
+                review_date = self.review_algorithm(
+                    last_view_datetime, card.count_of_views, True
+                )
+            else:
+                # Handle the case where last_view might not be a datetime object
+                continue
+
             if card.count_of_views == 20:
                 pass
-
-            elif (
-                self.review_algorithm(card.last_view, card.count_of_views)
-                < current_time
-            ):
+            elif review_date < current_time:
                 cards_to_review.append(card.word_id)
             else:
                 waiting_cards[int(review_date.timestamp())] = card.word_id
 
         return cards_to_review, waiting_cards
 
-    def add_new_user(self, user_id: int):
+    def add_new_user(self, user_id: int) -> None:
         self.cache[user_id] = UserProfile(
             created_cards=SortedList(), review_cards=[], waiting_cards=SortedDict()
         )
