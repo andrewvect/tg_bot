@@ -1,12 +1,19 @@
 """User model file."""
-
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.properties import MappedColumn
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .card import Card  # noqa: F401
+    from .invoice import Invoice  # noqa: F401
+    from .settings import Settings  # noqa: F401
+    from .statistic import Statistic  # noqa: F401
+    from .user_text import UserText  # noqa: F401
 
 
 class User(Base):
@@ -69,8 +76,8 @@ class User(Base):
     )
     """ Relationship with Statistic model """
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.first_name} {self.second_name} ({self.user_name})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<User(id={self.id}, telegram_id={self.telegram_id}, user_name={self.user_name})>"
