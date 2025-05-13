@@ -1,30 +1,33 @@
 import asyncio
 
 import yaml
-from googletrans import Translator
+from googletrans import Translator  # type: ignore
 
 
-async def translate_words(yaml_file_path):
+async def translate_words(yaml_file_path: str) -> dict[str, str]:
     """
     Translates words from a YAML file to a specified target language using Google Translate.
 
     Args:
         yaml_file_path (str): The path to the YAML file containing the words to translate.
         target_language (str): The target language code (e.g., 'en' for English, 'es' for Spanish).
+
+    Returns:
+        dict[str, str]: A dictionary containing the original words and their translations.
     """
 
     try:
-        with open(yaml_file_path) as file:
+        with open(yaml_file_path, encoding="utf-8") as file:
             words = yaml.safe_load(file)
     except FileNotFoundError:
         print(f"Error: File not found at {yaml_file_path}")
-        return
+        return {}
     except yaml.YAMLError as e:
         print(f"Error: Could not parse YAML: {e}")
-        return
+        return {}
 
     translator = Translator()
-    translated_words = {}
+    translated_words: dict[str, str] = {}
 
     for entry in words.values():
         latin_word = entry["serbian_word"].get("Latin", "")
@@ -36,7 +39,7 @@ async def translate_words(yaml_file_path):
                 else:
                     entry["translation"] = translation.text
                 print(f"Original: {latin_word}, Translated: {translation.text}")
-            except Exception as e:
+            except (AttributeError, ValueError, KeyError) as e:
                 print(f"Error translating '{latin_word}': {e}")
                 entry["translation"] = None  # or some other placeholder
 
@@ -46,7 +49,8 @@ async def translate_words(yaml_file_path):
     return translated_words
 
 
-async def main():
+async def main() -> None:
+    """Main function to execute the translation process."""
     yaml_file = "words.yaml"  # Replace with your YAML file path
     translated = await translate_words(yaml_file)
 
