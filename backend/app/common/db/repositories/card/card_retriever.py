@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...models.card import Card
@@ -22,7 +24,11 @@ class CardRetriever(Repository[Card]):
         super().__init__(type_model=Card, session=session)
 
     async def get_many(
-        self, filter_condition, limit: int = DEFAULT_LIMIT, order_by=None
+        self,
+        filter_condition: Any,
+        limit: int = DEFAULT_LIMIT,
+        order_by: Any = None,
+        options: list[Any] | None = None,
     ) -> list[Card]:
         """Retrieve multiple cards from the database based on a filter condition.
 
@@ -30,11 +36,12 @@ class CardRetriever(Repository[Card]):
         - filter_condition: SQLAlchemy clause to filter cards.
         - limit: Maximum number of cards to retrieve (default: 100).
         - order_by: Optional SQLAlchemy clause to order the result.
+        - options: Optional list of load options.
 
         Returns:
         - List of Card objects.
         """
-        result = await super().get_many(filter_condition, limit, order_by)
+        result = await super().get_many(filter_condition, limit, order_by, options)
         if result is None:
             raise NoCards
-        return result
+        return list(result)
