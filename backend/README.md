@@ -13,7 +13,7 @@ The database schema is visualized below:
 
 ![Database Schema](diagrams/database.svg)
 
-The database is built using SQLModel, which combines SQLAlchemy and Pydantic to provide both ORM capabilities and data validation through Python type hints.
+The database is built using SQLAlchemy and Pydantic to provide both ORM capabilities and data validation through Python type hints.
 
 ## Docker Compose
 
