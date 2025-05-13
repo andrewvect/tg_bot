@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from datetime import datetime
 from typing import Annotated
 
 from aiogram import Bot
@@ -12,6 +13,7 @@ from fastapi.security import (
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.common.cache import users_states
+from app.common.cache.states import UserProfile
 from app.common.db import Database
 from app.common.db.repositories import SettingsRepo
 from app.core.config import settings
@@ -59,16 +61,26 @@ def get_bot_instance() -> Bot:
 BotDep = Annotated[Bot, Depends(get_bot_instance)]
 
 
-def get_cache() -> dict:
+def get_cache() -> dict[int, UserProfile]:
     return users_states
 
 
-CacheDep = Annotated[dict, Depends(get_cache)]
+CacheDep = Annotated[dict[int, UserProfile], Depends(get_cache)]
 
 
 def get_word_card_handler(db: DbDep, cache: CacheDep) -> WordCardHandler:
     """Get an instance of WordCardHandler with database session and cache dependencies."""
-    return WordCardHandler(db=db, cache=cache, review_algorithm=review_algorithm)
+
+    # Create a wrapper to convert the int timestamp to datetime
+    def review_algorithm_wrapper(
+        checks: int, passed: bool = True, review_date: datetime | None = None
+    ) -> datetime:
+        timestamp = review_algorithm(checks, passed, review_date)
+        return datetime.fromtimestamp(timestamp)
+
+    return WordCardHandler(
+        db=db, cache=cache, review_algorithm=review_algorithm_wrapper
+    )
 
 
 WordCardHandlerDep = Annotated[WordCardHandler, Depends(get_word_card_handler)]
@@ -92,7 +104,7 @@ SettingsRepoDep = Annotated[SettingsRepo, Depends(get_settings_repo)]
 
 # New dependency for SettingService
 def get_settings_service(
-    settings_repo: SettingsRepo = Depends(get_settings_repo),
+    settings_repo: SettingsRepoDep,
 ) -> SettingService:
     return SettingService(repository=settings_repo)
 
