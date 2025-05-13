@@ -7,6 +7,9 @@ node_modules/
 .env
 .ruff_cache/
 .pytest_cache/
+.mpytest_cache/
+.bot_polling/
+
 
 
 .vscode/launch.json
