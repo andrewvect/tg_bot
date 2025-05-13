@@ -48,13 +48,18 @@ class TextsRepo(Repository[Texts]):
         result = await self.session.execute(query)
         text = result.scalars().first()
 
+        if text is None:
+            raise TextNotFound
+
         return text
 
-    async def get_random_text_by_no_marked_user(self, subquery, level: int) -> Texts:
+    async def get_random_text_by_no_marked_user(
+        self, subquery: list[int], level: int
+    ) -> Texts:
         """Fetches a random text matching the specified level and not marked by user.
 
         Parameters:
-            subquery (list): List of user_id
+            subquery (list[int]): List of user_id
             level (int): The level of the text to fetch.
 
         Returns:
