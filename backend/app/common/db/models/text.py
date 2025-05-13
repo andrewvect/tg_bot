@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .level import Level  # noqa: F401
+    from .user_text import UserText  # noqa: F401
 
 
 class Texts(Base):
@@ -30,10 +36,10 @@ class Texts(Base):
     user_texts: Mapped["UserText"] = relationship("UserText", back_populates="text")  # noqa
     """ Relationship with UserText model """
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.native_title} ({self.level})"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"<Texts(foreign_title={self.foreign_title}, native_title={self.native_title}, "
             f"level={self.level}, foreign_text={self.foreign_text}, native_text={self.native_text})>"
