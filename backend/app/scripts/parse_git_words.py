@@ -1,9 +1,9 @@
 """Script for upload words from git to database"""
-import requests
+import requests  # type: ignore
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.common.db.models import Word
 from app.common.db.models.sentence import Sentence
@@ -20,7 +20,7 @@ class GitWordParser:
     def __init__(self, config: Settings):
         self.url_to_git_file = config.URL_TO_GIT_FILES
 
-    def get_words_from_git(self):
+    def get_words_from_git(self) -> str:
         words = ""
         for file in self.files:
             url = f"{self.url_to_git_file}{file}"
@@ -33,12 +33,12 @@ class GitWordParser:
                 )
         return words
 
-    def create_db_connection(self) -> sessionmaker:
+    def create_db_connection(self) -> sessionmaker[Session]:
         engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, echo=True, future=True)
         Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         return Session
 
-    def save_words_to_db(self):
+    def save_words_to_db(self) -> None:
         words_text = self.get_words_from_git()
         parsed_data = yaml.safe_load(words_text)
         Session = self.create_db_connection()
@@ -57,7 +57,7 @@ class GitWordParser:
                     logger.error(f"Database error: {e}")
                     break
 
-    def update_word_in_db(self):
+    def update_word_in_db(self) -> None:
         words_text = self.get_words_from_git()
         parsed_data = yaml.safe_load(words_text)
 
@@ -69,6 +69,11 @@ class GitWordParser:
                 try:
                     # Update word based on the Serbian Latin value as unique identifier.
                     existing_word = session.get(Word, id)
+
+                    # Skip if word doesn't exist
+                    if existing_word is None:
+                        logger.warning(f"Word with ID {id} not found in database")
+                        continue
 
                     if (
                         existing_word.native_word != item["translation"]
