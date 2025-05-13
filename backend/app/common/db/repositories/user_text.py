@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.sql import Select
 
 from ..models import UserText
 from .abstract import Repository
@@ -28,7 +29,7 @@ class UserTextRepo(Repository[UserText]):
         await self.session.commit()
         return user_text_entry
 
-    async def get_subquery_by_user_id(self, user_id: int) -> UserText:
+    async def get_subquery_by_user_id(self, user_id: int) -> Select[tuple[int]]:
         """Return subquery with user relations with texts."""
         subquery = select(UserText.text_id).filter(UserText.user_telegram_id == user_id)
         return subquery
