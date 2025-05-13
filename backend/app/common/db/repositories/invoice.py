@@ -19,6 +19,8 @@ DEFAULT_CURRENCY = "USD"
 
 
 class InvoiceRepo(Repository[Invoice]):
+    type_model: type[Invoice]
+
     def __init__(self, session: AsyncSession):
         super().__init__(type_model=Invoice, session=session)
 
@@ -42,7 +44,7 @@ class InvoiceRepo(Repository[Invoice]):
                 payload=payload,
             )
             self.session.add(new_invoice)
-            self.session.commit()
+            await self.session.commit()
             return new_invoice
         except Exception as e:
             await self.session.rollback()
@@ -55,6 +57,8 @@ class InvoiceRepo(Repository[Invoice]):
             invoice = await self.get_by_condition(
                 self.type_model.invoice_id == invoice_id
             )
+            if invoice is None:
+                raise ValueError(f"Invoice with ID {invoice_id} not found")
             invoice.status = status
             await self.session.commit()
             return invoice
