@@ -1,8 +1,13 @@
+from typing import TYPE_CHECKING
+
 import sqlalchemy as sa
 from sqlalchemy import CheckConstraint, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .user import User  # noqa: F401
 
 
 class Settings(Base):
@@ -52,8 +57,8 @@ class Settings(Base):
     )
     """ Relationship to the associated User """
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.spoiler_settings)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Settings(id={self.id}, spoiler_settings={self.spoiler_settings})>"
