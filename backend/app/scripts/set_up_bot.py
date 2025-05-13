@@ -11,7 +11,7 @@ from app.utils.logger import setup_logger
 logger = setup_logger(__name__)
 
 
-async def delete_telegram_webhook(bot) -> bool:
+async def delete_telegram_webhook(bot: Bot) -> bool:
     try:
         result = await bot.delete_webhook()
         if result:
@@ -40,7 +40,7 @@ async def set_telegram_webhook(bot: Bot) -> bool:
     return False
 
 
-async def set_telegram_web_app_url(bot: Bot):
+async def set_telegram_web_app_url(bot: Bot) -> bool:
     """Set up button inside chat"""
     try:
         if settings.ENVIRONMENT == "local":
@@ -65,7 +65,7 @@ async def set_telegram_web_app_url(bot: Bot):
     return False
 
 
-async def set_telegram_web_app_mini_url(bot: Bot):
+async def set_telegram_web_app_mini_url(bot: Bot) -> bool:
     """Set up button in list of chats"""
     try:
         if settings.ENVIRONMENT == "local":
