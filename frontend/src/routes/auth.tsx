@@ -40,7 +40,7 @@ function AuthPage() {
         })
 
         if (response.access_token) {
-          localStorage.setItem('token', response.access_token) // Store token in localStorage only
+          localStorage.setItem('token', response.access_token)
           localStorage.removeItem('review_words')
           localStorage.removeItem('new_words');
 
