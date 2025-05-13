@@ -1,7 +1,11 @@
 """
 Card model file.
 """
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from .user import User  # noqa: F401
+    from .word import Word  # noqa: F401
 from sqlalchemy import (
     BigInteger,
     CheckConstraint,
@@ -47,8 +51,8 @@ class Card(Base):
     user: Mapped["User"] = relationship("User", back_populates="cards")  # noqa
     word: Mapped["Word"] = relationship("Word", back_populates="card")  # noqa
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Card for User ID {self.user_id} with Word ID {self.word_id} viewed {self.count_of_views} times"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Card(user_id={self.user_id}, word_id={self.word_id}, count_of_views={self.count_of_views}, last_view={self.last_view})>"
