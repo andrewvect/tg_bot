@@ -10,7 +10,7 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 async def get_user_settings(
     settings_service: SettingsServiceDep,
     user_id: int = Depends(verify_token),
-):
+) -> SettingsResponse:
     """Get user settings"""
     user = await settings_service.get_user_settings(user_id)
     return SettingsResponse(
@@ -25,7 +25,7 @@ async def set_user_settings(
     request: SettingsUpdateRequest,
     settings_service: SettingsServiceDep,
     user_id: int = Depends(verify_token),
-):
+) -> SettingsResponse:
     """Set user settings"""
     user = await settings_service.update_user_settings(user_id, request)
     return SettingsResponse(
