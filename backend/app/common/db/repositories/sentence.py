@@ -24,7 +24,8 @@ class SentenceRepo(Repository[Sentence]):
             session (AsyncSession): The database session for executing queries.
         """
         super().__init__(type_model=Sentence, session=session)
-        self._session: AsyncSession = session  # Encapsulate session to make it private.
+        # Encapsulate session to make it private.
+        self._session: AsyncSession = session
 
     async def create(self, sentence: str, translation: str, word_id: int) -> None:
         """
@@ -61,5 +62,5 @@ class SentenceRepo(Repository[Sentence]):
         Args:
             sentence (Sentence): The sentence object to be saved.
         """
-        logging.info(f"Saving sentence: {sentence.sentence}")
+        logging.info(f"Saving sentence: {sentence}")
         await self._session.merge(sentence)
