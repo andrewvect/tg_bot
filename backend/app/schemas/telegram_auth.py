@@ -36,5 +36,5 @@ class RequestInitData(BaseModel):
 
 class ResponceToken(BaseModel):
     access_token: str
-    expires_in: int
+    expires_in: float
     user_id: int
