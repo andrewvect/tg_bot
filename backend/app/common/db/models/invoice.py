@@ -1,6 +1,6 @@
 """Invoice model file."""
-
 import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     BigInteger,
@@ -16,11 +16,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
+if TYPE_CHECKING:
+    from .user import User  # noqa: F401
+
 
 class Invoice(Base):
     """Invoice model representing payment invoices."""
-
-    __tablename__ = "invoice"
 
     # Fields
     user_id: Mapped[int] = mapped_column(
@@ -66,12 +67,12 @@ class Invoice(Base):
     user = relationship("User", back_populates="invoices", lazy="joined")
     """Relationship to the User table, representing the user who owns the invoice."""
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"Invoice(invoice_id={self.invoice_id}, user_id={self.user_id}, status={self.status}, "
             f"currency={self.currency}, price={self.price}, payload={self.payload}, "
             f"created_at={self.created_at}, updated_at={self.updated_at})"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Invoice(invoice_id={self.invoice_id}, user_id={self.user_id}, status={self.status}, price={self.price})>"
