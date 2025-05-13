@@ -22,7 +22,8 @@ def create_access_token(subject: str | Any, expires_delta: timedelta) -> str:
 def verify_access_token(token: str) -> dict[str, Any]:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
+        # Ensure we return a properly typed dict
+        return dict(payload)
     except jwt.ExpiredSignatureError:
         raise ValueError("Token has expired")
     except jwt.PyJWTError:
