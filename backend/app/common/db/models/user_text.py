@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey, Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .text import Texts  # noqa: F401
+    from .user import User  # noqa: F401
 
 
 class UserText(Base):
@@ -38,8 +44,8 @@ class UserText(Base):
     Establishes a bidirectional many-to-many relationship with texts.
     The 'back_populates' argument connects it to the 'user_texts' attribute in the 'Texts' class."""
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"User: {self.user}, Text: {self.text}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<UserText(user={self.user}, text={self.text})>"
