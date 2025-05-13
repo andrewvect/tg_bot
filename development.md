@@ -1,4 +1,27 @@
-# FastAPI Project - Development
+# Project - Development
+
+Create a `.env` file in the root of the project, based on the `.env.example` file.
+
+Add exsisting bot token to the '.env' file or create a new via BotFather.
+
+## Bot Polling
+The bot polling is a separate service that runs in a different container. It is responsible for receiving messages from the Telegram API and sending them to the backend service.
+
+So first you need to git clone the repository https://github.com/andrewvect/bot_polling
+
+```bash
+git clone https://github.com/andrewvect/bot_polling
+```
+Then you need to run bot polling container via command and pass path to the `.env` file:
+
+```bash
+cd bot_polling && \
+docker build -t bot_polling_image . && \
+docker run -d --name bot_polling \
+    -v $(pwd)/../.env:/app/.env \
+    -v $(pwd)/Dockerfile:/app/Dockerfile \
+    bot_polling_image
+```
 
 ## Docker Compose
 
@@ -8,9 +31,9 @@
 docker compose watch
 ```
 
-* Now you can open your browser and interact with these URLs:
+* Now you can open your telegram and interact with the bot.:
 
-Frontend, built with Docker, with routes handled based on the path: http://localhost:5173
+* In browser, you can interact with the services:
 
 Backend, JSON based web API based on OpenAPI: http://localhost:8000
 
