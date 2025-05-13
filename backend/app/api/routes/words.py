@@ -23,7 +23,7 @@ async def new_card(
     request: NewCardRequest,
     word_service: WordCardHandlerDep,
     user_id: int = Security(verify_token),
-):
+) -> NewCardResponce:
     """Create a new card for the user after verifying the token"""
     try:
         created_card = await word_service.create_new_card(
@@ -41,7 +41,7 @@ async def new_card(
 async def get_new_word(
     word_service: WordCardHandlerDep,
     user_id: int = Security(verify_token),
-):
+) -> WordsResponse:
     """Get next new word for user to create card"""
     try:
         words = await word_service.get_new_words(user_id=user_id)
@@ -94,8 +94,8 @@ async def get_review_words(
     user_id: int = Security(verify_token),
 ) -> WordsResponse:
     try:
-        words = await word_service.get_review_words(user_id=user_id)
-        words = [
+        db_words = await word_service.get_review_words(user_id=user_id)
+        word_responses = [
             WordResponse(
                 word_id=word.id,
                 latin_word=word.latin_word,
@@ -114,9 +114,9 @@ async def get_review_words(
                 if word.sentences
                 else [],
             )
-            for word in words
+            for word in db_words
         ]
-        return WordsResponse(words=words)
+        return WordsResponse(words=word_responses)
 
     except EndWordsToReview:
         return WordsResponse(words=[])
