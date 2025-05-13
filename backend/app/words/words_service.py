@@ -1,4 +1,5 @@
 import datetime
+from collections.abc import Callable
 
 from sqlalchemy.orm import joinedload
 
@@ -6,7 +7,6 @@ from app.common.cache.states import UserProfile
 from app.common.db.database import Database
 from app.common.db.models import Word
 from app.common.db.models.card import Card
-from app.common.shemas.words import WordResponse
 
 
 class EndWordsInDb(Exception):
@@ -23,11 +23,16 @@ class EndWordsToReview(Exception):
 
 class WordCardHandler:
     def __init__(
-        self, db: Database, cache: dict[int, UserProfile], review_algorithm: callable
+        self,
+        db: Database,
+        cache: dict[int, UserProfile],
+        review_algorithm: Callable[
+            [int, bool, datetime.datetime | None], datetime.datetime
+        ],
     ):
         self.db = db
         self.cache = cache
-        self.review_algorithm: callable = review_algorithm
+        self.review_algorithm = review_algorithm
 
     async def create_new_card(
         self, telegram_id: int, known: bool, word_id: int
@@ -81,15 +86,13 @@ class WordCardHandler:
         if passed:
             card = await self.db.card.add_review(user_id=user_id, word_id=word_id)
             self.cache[user_id].waiting_cards[
-                self.review_algorithm(checks=card.count_of_views)
+                self.review_algorithm(card.count_of_views, False, None)
             ] = word_id
 
         else:
             self.cache[user_id].review_cards.append(word_id)
 
-    async def get_review_words(
-        self, user_id: int, limit: int = 20
-    ) -> list[WordResponse]:
+    async def get_review_words(self, user_id: int, limit: int = 20) -> list[Word]:
         """Get words for review"""
 
         self._refresh_user_reviews(user_id)
@@ -106,7 +109,7 @@ class WordCardHandler:
 
         if not words:
             raise EndWordsToReview("No words to review")
-        return words
+        return list(words)
 
     def get_review_words_count(self, user_id: int) -> int:
         """Get count of words for review"""
@@ -114,7 +117,7 @@ class WordCardHandler:
 
         return len(self.cache[user_id].review_cards)
 
-    def _refresh_user_reviews(self, user_id):
+    def _refresh_user_reviews(self, user_id: int) -> None:
         current_time = int(datetime.datetime.now().timestamp())
         for date_review, word_id in self.cache[user_id].waiting_cards.items():
             if date_review < current_time:
