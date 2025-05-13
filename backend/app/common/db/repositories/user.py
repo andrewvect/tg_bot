@@ -44,7 +44,7 @@ class UserRepo(Repository[User]):
         first_name: str | None = None,
         second_name: str | None = None,
         is_premium: bool = False,
-    ) -> User:
+    ) -> User | None:
         """
         Create a new user in the repository.
 
@@ -56,7 +56,7 @@ class UserRepo(Repository[User]):
             is_premium (bool): Is the user a premium member? Defaults to False.
 
         Returns:
-            User: The newly created user object.
+            User | None: The newly created user object or None if creation failed.
         """
         new_user = User(
             telegram_id=telegram_id,
@@ -72,6 +72,9 @@ class UserRepo(Repository[User]):
 
         except IntegrityError:
             await self.session.rollback()
+            return None
+
+        return new_user
 
     async def get_all_users(self) -> list[User]:
         """
@@ -98,9 +101,9 @@ class UserRepo(Repository[User]):
         statement = select(self.type_model)
         result = await self.session.execute(statement)
         users = result.scalars().unique().all()
-        return users
+        return list(users)
 
-    async def update_paid_status(self, telegram_id: int):
+    async def update_paid_status(self, telegram_id: int) -> None:
         """
         Update the premium status of a user to True.
 
