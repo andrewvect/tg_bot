@@ -1,4 +1,5 @@
 import secrets
+import warnings
 from typing import Annotated, Any, Literal
 
 from pydantic import (
@@ -82,32 +83,16 @@ class Settings(BaseSettings):
             )
         )
 
-    SMTP_TLS: bool = True
-    SMTP_SSL: bool = False
-    SMTP_PORT: int = 587
-    SMTP_HOST: str | None = None
-    SMTP_USER: str | None = None
-    SMTP_PASSWORD: str | None = None
-    # TODO: update type to EmailStr when sqlmodel supports it
-    EMAILS_FROM_EMAIL: str | None = None
-    EMAILS_FROM_NAME: str | None = None
-
-    @model_validator(mode="after")
-    def _set_default_emails_from(self) -> Self:
-        if not self.EMAILS_FROM_NAME:
-            self.EMAILS_FROM_NAME = self.PROJECT_NAME
-        return self
-
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
 
     BOT_TOKEN: str
     TELEGRAM_TESTING: bool
     URL_TO_GIT_FILES: AnyUrl | None = None
 
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def emails_enabled(self) -> bool:
-        return bool(self.SMTP_HOST and self.EMAILS_FROM_EMAIL)
+        return False
 
     # TODO: update type to EmailStr when sqlmodel supports it
     EMAIL_TEST_USER: str = "test@example.com"
@@ -118,16 +103,15 @@ class Settings(BaseSettings):
     ADMIN_TG_ID: int | None = None
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
-        # if value == "changethis":
-        #     message = (
-        #         f'The value of {var_name} is "changethis", '
-        #         "for security, please change it, at least for deployments."
-        #     )
-        #     if self.ENVIRONMENT == "local":
-        #         warnings.warn(message, stacklevel=1)
-        #     else:
-        #         raise ValueError(message)
-        pass
+        if value == "changethis":
+            message = (
+                f'The value of {var_name} is "changethis", '
+                "for security, please change it, at least for deployments."
+            )
+            if self.ENVIRONMENT == "local":
+                warnings.warn(message, stacklevel=1)
+            else:
+                raise ValueError(message)
 
     @model_validator(mode="after")
     def _enforce_non_default_secrets(self) -> Self:
