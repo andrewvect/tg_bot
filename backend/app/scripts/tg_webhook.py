@@ -41,7 +41,7 @@ async def set_telegram_webhook(bot: Bot) -> bool:
 
 async def set_telegram_web_app_url(bot: Bot) -> bool:
     try:
-        if settings.ENVIRONMENT == "local":
+        if settings.TELEGRAM_TESTING:
             protocol = "http"
         else:
             protocol = "https"
