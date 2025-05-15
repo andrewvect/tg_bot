@@ -101,6 +101,7 @@ class Settings(BaseSettings):
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
 
     BOT_TOKEN: str
+    TELEGRAM_TESTING: bool = False
     URL_TO_GIT_FILES: AnyUrl | None = None
 
     @computed_field  # type: ignore[prop-decorator]

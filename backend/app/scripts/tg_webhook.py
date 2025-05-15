@@ -61,10 +61,10 @@ async def set_telegram_web_app_url(bot: Bot) -> bool:
     return False
 
 
-async def set_up_bot(mode: str) -> None:
+async def set_up_bot() -> None:
     try:
         bot = Bot(token=settings.BOT_TOKEN)
-        if mode == "local":
+        if settings.TELEGRAM_TESTING:
             bot.session.api = TEST
 
         else:
@@ -83,4 +83,4 @@ async def set_up_bot(mode: str) -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(set_up_bot(mode="test"))
+    asyncio.run(set_up_bot())

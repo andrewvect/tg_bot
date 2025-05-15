@@ -39,7 +39,8 @@ async def webhook(request: Request) -> Response:
     update = types.Update(**update)
 
     bot = Bot(token=settings.BOT_TOKEN)
-    if settings.ENVIRONMENT == "local":
+    # Use telegram test environment
+    if settings.TELEGRAM_TESTING:
         # For local testing, set the bot to TEST mode
         bot.session.api = TEST
     try:
