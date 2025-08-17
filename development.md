@@ -314,6 +314,54 @@ If you're still having issues:
    - Complete error messages
    - Steps to reproduce the problem
 
+## Contributing to Development
+
+### Making Changes
+
+1. **Fork the repository** and create a feature branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make your changes** following the project conventions:
+   - Backend: Follow FastAPI and SQLAlchemy best practices
+   - Frontend: Use TypeScript and follow React patterns
+   - Bot: Update content.yaml for message changes
+
+3. **Test your changes**:
+   ```bash
+   # Backend tests
+   docker compose exec backend bash scripts/tests-start.sh
+   
+   # Frontend tests
+   cd frontend && npx playwright test
+   
+   # Manual testing with your bot
+   ```
+
+4. **Commit and push**:
+   ```bash
+   git add .
+   git commit -m "feat: add your feature description"
+   git push origin feature/your-feature-name
+   ```
+
+5. **Create a Pull Request** with a clear description of your changes
+
+### Code Style
+
+- **Python**: Code is automatically formatted with `ruff`
+- **TypeScript/React**: Code is formatted with `prettier` and linted with `eslint`
+- **Commits**: Use conventional commit messages (feat:, fix:, docs:, etc.)
+- **Pre-commit hooks**: Install with `uv run pre-commit install`
+
+### Development Guidelines
+
+- **Keep it simple**: Make minimal changes that solve specific problems
+- **Test thoroughly**: Ensure your changes don't break existing functionality
+- **Document changes**: Update relevant documentation files
+- **Follow patterns**: Maintain consistency with existing code structure
+
 ## Local Development
 
 The Docker Compose files are configured so that each of the services is available in a different port in `localhost`.

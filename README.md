@@ -284,6 +284,47 @@ The application supports deployment with:
 - Review [development.md](./development.md) for detailed setup
 - Create an issue on GitHub for bugs or questions
 
+## ❓ Frequently Asked Questions
+
+### Setup Questions
+
+**Q: Do I need to know Serbian to use this bot?**
+A: No! The bot is designed to teach Serbian vocabulary to speakers of other languages. All interface text and instructions are provided in the user's language.
+
+**Q: Why do I need a separate bot polling service?**
+A: The bot polling service handles Telegram message reception during development. In production, the main application uses webhooks instead.
+
+**Q: Can I use this bot to learn other languages?**
+A: The current version is specifically designed for Serbian vocabulary, but the architecture could be adapted for other languages by changing the word database and content files.
+
+**Q: How many words can I learn?**
+A: The bot includes 3700+ Serbian words organized by frequency of use, covering vocabulary from beginner (A1) to advanced (C1+) levels.
+
+### Technical Questions
+
+**Q: What's the difference between Cyrillic and Latin alphabets?**
+A: Serbian can be written in both Cyrillic (Ћирилица) and Latin (Latinica) scripts. The bot allows you to learn with either or both alphabets.
+
+**Q: How does the spaced repetition algorithm work?**
+A: Words you answer correctly appear less frequently, while words you find difficult appear more often. This optimizes your learning time and improves retention.
+
+**Q: Can I backup my learning progress?**
+A: Your progress is stored in the PostgreSQL database. You can backup the database or export your data through the admin interface.
+
+**Q: Is my data secure?**
+A: The bot only stores your Telegram ID, learning progress, and settings. No personal information is collected beyond what's necessary for the learning algorithm.
+
+### Usage Questions
+
+**Q: How often should I use the bot?**
+A: The spaced repetition algorithm works best with regular, short sessions. Even 10-15 minutes daily is more effective than occasional long sessions.
+
+**Q: What if I make a mistake marking a word as known/unknown?**
+A: Don't worry! The algorithm will adjust over time based on your continued performance with that word.
+
+**Q: Can I reset my progress and start over?**
+A: Yes, you can reset your progress through the settings or by contacting an admin to clear your data.
+
 ## 📚 Documentation
 
 - **[Technical Overview](./README_for_hiring_managers.md)** - Technology stack and architecture

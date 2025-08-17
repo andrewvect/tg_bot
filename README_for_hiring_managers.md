@@ -1,4 +1,8 @@
 
+# Serbian Vocabulary Learning Bot - Technical Overview
+
+This document provides a comprehensive technical overview of the Serbian vocabulary learning bot, including architecture, technology choices, and implementation details.
+
 ## Technology Stack and Features
 
 This vocabulary learning bot demonstrates modern full-stack development practices with a focus on educational technology and user experience optimization.
