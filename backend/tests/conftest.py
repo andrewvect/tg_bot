@@ -1,14 +1,20 @@
 import datetime
 import logging
 from collections.abc import AsyncGenerator, Generator
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
 import pytest_asyncio
 from faker import Faker
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool
 
@@ -57,7 +63,7 @@ def create_test_db():
 
 
 @pytest.fixture(scope="session")
-def engine():
+def engine() -> Generator[Engine, None, None]:
     # Create a synchronous engine instead of async
     engine = create_engine(
         str(settings.SQLALCHEMY_DATABASE_URI),  # Use the sync URI
@@ -69,7 +75,7 @@ def engine():
 
 
 @pytest_asyncio.fixture(scope="session")
-async def async_engine():
+async def async_engine() -> AsyncGenerator[AsyncEngine, None]:
     # Create an async engine
     async_engine = create_async_engine(
         str(settings.ASYNC_SQLALCHEMY_DATABASE_URI),
@@ -82,7 +88,7 @@ async def async_engine():
 
 
 @pytest.fixture(scope="function", autouse=True)
-def clean_tables(engine):
+def clean_tables(engine: Engine) -> Generator[None, None, None]:
     """Create and drop all tables for each test function."""
     with engine.begin() as conn:
         Base.metadata.drop_all(conn)
@@ -91,7 +97,7 @@ def clean_tables(engine):
 
 
 @pytest.fixture(scope="function")
-def db_session_factory(engine):
+def db_session_factory(engine: Engine) -> Generator[sessionmaker[Session], None, None]:
     sync_session = sessionmaker(
         engine,
         class_=Session,
@@ -101,8 +107,8 @@ def db_session_factory(engine):
 
 
 @pytest.fixture(scope="session")
-def async_db_session_factory(async_engine):
-    async_session = sessionmaker(
+def async_db_session_factory(async_engine: AsyncEngine) -> Generator[Any, None, None]:
+    async_session = async_sessionmaker(
         async_engine,
         class_=AsyncSession,
         expire_on_commit=False,
@@ -111,7 +117,7 @@ def async_db_session_factory(async_engine):
 
 
 @pytest.fixture(scope="function")
-def db_session(db_session_factory) -> Generator[Session, None, None]:
+def db_session(db_session_factory: sessionmaker[Session]) -> Generator[Session, None, None]:
     session = db_session_factory()
     yield session
     session.close()
@@ -120,16 +126,16 @@ def db_session(db_session_factory) -> Generator[Session, None, None]:
 
 @pytest_asyncio.fixture(scope="function")
 async def async_db_session(
-    async_db_session_factory,
-) -> Generator[AsyncSession, None, None]:
+    async_db_session_factory: Any,
+) -> AsyncGenerator[AsyncSession, None]:
     session = async_db_session_factory()
     yield session
     await session.close()
 
 
 @pytest.fixture(scope="function")
-def test_user(db_session) -> User:
-    user_data = {
+def test_user(db_session: Session) -> User:
+    user_data: dict[str, Any] = {
         "telegram_id": 123456789,
         "user_name": "test_user",
         "first_name": "Test",
@@ -145,7 +151,7 @@ def test_user(db_session) -> User:
 
 
 @pytest.fixture(scope="function")
-def test_user_settings(test_user, db_session):
+def test_user_settings(test_user: User, db_session: Session) -> Settings:
     settings = Settings(user_id=test_user.telegram_id, spoiler_settings=1)
     db_session.add(settings)
     db_session.commit()
@@ -153,13 +159,13 @@ def test_user_settings(test_user, db_session):
 
 
 @pytest.fixture(scope="function")
-def db_with_words(request, db_session) -> list[Word]:
-    count = 10  # default value
+def db_with_words(request: pytest.FixtureRequest, db_session: Session) -> list[Word]:
+    count: int = 10  # default value
     if hasattr(request, "param"):
         if isinstance(request.param, dict):
-            count = request.param.get("count", 10)
+            count = request.param.get("count", 10)  # type: ignore[assignment]
         else:
-            count = request.param
+            count = request.param  # type: ignore[assignment]
     faker = Faker()
     ru_faker = Faker("ru_RU")
     words = []
@@ -177,7 +183,7 @@ def db_with_words(request, db_session) -> list[Word]:
 
 
 @pytest.fixture(scope="function")
-def db_with_cards(db_session, test_user, db_with_words):
+def db_with_cards(db_session: Session, test_user: User, db_with_words: list[Word]) -> list[Card]:
     cards = []
     for word in db_with_words:
         card = Card(
@@ -194,7 +200,7 @@ def db_with_cards(db_session, test_user, db_with_words):
 
 @pytest.fixture(scope="function")
 def db_with_sentences(
-    db_session,  # noqa F811
+    db_session: Session,  # noqa F811
     test_user: User,  # noqa F811
     db_with_words: list[Word],  # noqa F811
 ) -> list[Sentence]:
@@ -215,12 +221,12 @@ def db_with_sentences(
 
 
 @pytest.fixture(scope="function")
-def set_up_cache(test_user):
+def set_up_cache(test_user: User) -> None:
     users_states[test_user.telegram_id] = UserProfile()
 
 
 @pytest.fixture(scope="function")
-def cache_with_created_cards(test_user, db_with_words, set_up_cache):  # noqa F811
+def cache_with_created_cards(test_user: User, db_with_words: list[Word], set_up_cache: None) -> Generator[Any, None, None]:  # noqa F811
     for word in db_with_words:
         users_states[test_user.telegram_id].created_cards.add(word.id)
         users_states[test_user.telegram_id].review_cards.append(word.id)
@@ -228,8 +234,8 @@ def cache_with_created_cards(test_user, db_with_words, set_up_cache):  # noqa F8
 
 
 @pytest.fixture(scope="function")
-def mock_tokens_service(test_user, test_app, db_session):  # noqa F811
-    def mock_token_service():
+def mock_tokens_service(test_user: User, test_app: Any, db_session: Session) -> Generator[None, None, None]:  # noqa F811
+    def mock_token_service() -> Mock:
         mock = Mock()
         mock.verify_access_token.return_value = test_user.telegram_id
         mock.verify.return_value = test_user.telegram_id
@@ -241,14 +247,14 @@ def mock_tokens_service(test_user, test_app, db_session):  # noqa F811
 
 
 @pytest.fixture(scope="function")
-def override_app_session(test_app, async_db_session):
+def override_app_session(test_app: Any, async_db_session: AsyncSession) -> Generator[None, None, None]:
     test_app.dependency_overrides[get_session] = lambda: async_db_session
     yield
     test_app.dependency_overrides = {}
 
 
 @pytest_asyncio.fixture(scope="function")
-async def client(test_app, override_app_session) -> AsyncGenerator[AsyncClient, None]:  # noqa F811
+async def client(test_app: Any, override_app_session: None) -> AsyncGenerator[AsyncClient, None]:  # noqa F811
     """Provides an async HTTP client for testing FastAPI endpoints."""
     async with AsyncClient(
         transport=ASGITransport(app=test_app), base_url="http://test"
