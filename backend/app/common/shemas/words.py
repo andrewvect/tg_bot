@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class ReviewRequest(BaseModel):
     passed: bool
     word_id: int
+    idempotency_key: str
 
 
 class ReviewResponse(BaseModel):
