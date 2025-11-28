@@ -1,7 +1,7 @@
 import datetime
 import logging
 from collections.abc import AsyncGenerator, Generator
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 import pytest_asyncio
@@ -23,20 +23,13 @@ TEST_DB_NAME = "test_db"
 
 
 @pytest.fixture(scope="session")
-def override_settings():
-    """Override application settings to use test database"""
-    with patch.object(settings, "POSTGRES_DB", TEST_DB_NAME):
-        yield
-
-
-@pytest.fixture(scope="session")
-def test_app(override_settings):  # noqa F811
-    """Create a test instance of the app with patched settings"""
+def test_app():
+    """Create a test instance of the app"""
     return create_app()
 
 
 @pytest.fixture(scope="session", autouse=True)
-def create_test_db():  # noqa F811
+def create_test_db():
     """Create the test database using SQLAlchemy."""
 
     from sqlalchemy.engine.url import make_url
@@ -64,7 +57,7 @@ def create_test_db():  # noqa F811
 
 
 @pytest.fixture(scope="session")
-def engine(override_settings):  # noqa F811
+def engine():
     # Create a synchronous engine instead of async
     engine = create_engine(
         str(settings.SQLALCHEMY_DATABASE_URI),  # Use the sync URI
@@ -76,7 +69,7 @@ def engine(override_settings):  # noqa F811
 
 
 @pytest_asyncio.fixture(scope="session")
-async def async_engine(override_settings):  # noqa F811
+async def async_engine():
     # Create an async engine
     async_engine = create_async_engine(
         str(settings.ASYNC_SQLALCHEMY_DATABASE_URI),
