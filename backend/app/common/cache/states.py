@@ -3,6 +3,8 @@ from dataclasses import dataclass, field
 
 from sortedcontainers import SortedDict, SortedList, SortedSet  # type: ignore
 
+from .idempotency import IdempotencyStore
+
 
 @dataclass
 class UserProfile:
@@ -21,3 +23,5 @@ class UserProfile:
 
 
 users_states: dict[int, UserProfile] = {}
+
+idempotency_store = IdempotencyStore(ttl_hours=24)
