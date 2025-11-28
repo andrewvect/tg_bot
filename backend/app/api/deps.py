@@ -13,7 +13,8 @@ from fastapi.security import (
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.common.cache import users_states
-from app.common.cache.states import UserProfile
+from app.common.cache.idempotency import IdempotencyStore
+from app.common.cache.states import UserProfile, idempotency_store
 from app.common.db import Database
 from app.common.db.repositories import SettingsRepo
 from app.core.config import settings
@@ -67,6 +68,14 @@ def get_cache() -> dict[int, UserProfile]:
 
 
 CacheDep = Annotated[dict[int, UserProfile], Depends(get_cache)]
+
+
+def get_idempotency_store() -> IdempotencyStore:
+    return idempotency_store
+
+
+IdempotencyStoreDep = Annotated[IdempotencyStore,
+                                Depends(get_idempotency_store)]
 
 
 def get_word_card_handler(db: DbDep, cache: CacheDep) -> WordCardHandler:
