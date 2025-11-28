@@ -3,7 +3,7 @@ from venv import logger
 # ensure Security is imported
 from fastapi import APIRouter, HTTPException, Security
 
-from app.api.deps import WordCardHandlerDep, verify_token
+from app.api.deps import IdempotencyStoreDep, WordCardHandlerDep, verify_token
 from app.common.shemas.words import (
     NewCardRequest,
     NewCardResponce,
@@ -75,17 +75,30 @@ async def get_new_word(
 async def add_review(
     request: ReviewRequest,
     word_service: WordCardHandlerDep,
+    idempotency_store: IdempotencyStoreDep,
     user_id: int = Security(verify_token),
 ) -> ReviewResponse:
-    """Add review to word card"""
+    """Add review to word card with idempotency support"""
 
+    # Check if idempotency key already exists
+    cached_response = idempotency_store.check(request.idempotency_key, user_id)
+    if cached_response is not None:
+        return cached_response
+
+    # Process the review
     await word_service.add_review(
         user_id=user_id,
         passed=request.passed,
         word_id=request.word_id,
     )
 
-    return ReviewResponse(message="Review added successfully")
+    # Create response
+    response = ReviewResponse(message="Review added successfully")
+
+    # Store response with idempotency key
+    idempotency_store.store(request.idempotency_key, user_id, response)
+
+    return response
 
 
 @router.get("/review/", response_model=WordsResponse)
