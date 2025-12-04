@@ -81,8 +81,10 @@ def create_app() -> FastAPI:
     @app.exception_handler(Exception)
     async def generic_exception(
         request: Request, exc: Exception
-    ) -> tuple[dict[str, str], int]:
+    ):
         """Handle exceptions globally."""
+        from fastapi.responses import JSONResponse
+
         logger.error(
             "Unhandled error: %s %s %s %s",
             exc,
@@ -90,7 +92,10 @@ def create_app() -> FastAPI:
             request.method,
             request.body,
         )
-        return {"detail": "Internal Server Error"}, 500
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal Server Error"},
+        )
 
     # Set all CORS enabled origins
     if settings.all_cors_origins:
