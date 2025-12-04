@@ -8,6 +8,8 @@ import sentry_sdk
 from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
+from idempotency_header_middleware import IdempotencyHeaderMiddleware
+from idempotency_header_middleware.backends import MemoryBackend
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
@@ -67,7 +69,8 @@ def create_app() -> FastAPI:
             if path_key.startswith("/api/v1/cards"):  # Target only card endpoints
                 for operation_key in path_item:
                     if operation_key in ["get", "post", "patch", "put", "delete"]:
-                        path_item[operation_key]["security"] = [{"BearerAuth": []}]
+                        path_item[operation_key]["security"] = [
+                            {"BearerAuth": []}]
 
         app.openapi_schema = openapi_schema
         return app.openapi_schema
@@ -98,6 +101,12 @@ def create_app() -> FastAPI:
             allow_methods=["*"],
             allow_headers=["*"],
         )
+
+    # Add idempotency middleware with memory backend
+    app.add_middleware(
+        IdempotencyHeaderMiddleware,
+        backend=MemoryBackend(),
+    )
 
     app.include_router(api_router, prefix=settings.API_V1_STR)
     return app
