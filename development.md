@@ -1,61 +1,366 @@
 # Project - Development
 
-Create a `.env` file in the root of the project, based on the `.env.example` file.
+## Prerequisites
 
-Add exsisting bot token to the '.env' file or create a new via BotFather.
+Before starting development, ensure you have:
+- **Docker** and **Docker Compose** installed
+- **Git** for version control
+- **A Telegram Bot Token** (see setup instructions below)
+- **Python 3.8+** and **Node.js 18+** (for local development without Docker)
 
-## Bot Polling
-The bot polling is a separate service that runs in a different container. It is responsible for receiving messages from the Telegram API and sending them to the backend service.
+## Initial Setup
 
-So first you need to git clone the repository https://github.com/andrewvect/bot_polling
+### 1. Environment Configuration
+
+Create a `.env` file in the root of the project, based on the `.env.example` file:
 
 ```bash
-git clone https://github.com/andrewvect/bot_polling
+cp .env.example .env
 ```
-Then you need to run bot polling container via command and pass path to the `.env` file:
 
-```bash
-cd bot_polling && \
-docker build -t bot_polling_image . && \
-docker run -d --name bot_polling \
-    -v $(pwd)/../.env:/app/.env \
-    -v $(pwd)/Dockerfile:/app/Dockerfile \
-    bot_polling_image
-```
+**Important**: Edit the `.env` file and configure at least these essential variables:
+- `BOT_TOKEN` - Your Telegram bot token (required)
+- `POSTGRES_PASSWORD` - A secure password for the database
+- `SECRET_KEY` - A secure random key for JWT tokens
+
+### 2. Getting a Telegram Bot Token
+
+1. Open Telegram and search for [@BotFather](https://t.me/BotFather)
+2. Start a chat and use the `/newbot` command
+3. Follow the prompts to create your bot:
+   - Choose a name for your bot (e.g., "Serbian Vocab Bot")
+   - Choose a username ending in "bot" (e.g., "serbian_vocab_bot")
+4. Copy the bot token and add it to your `.env` file:
+   ```env
+   BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+   ```
+5. (Optional) Configure bot commands with BotFather:
+   ```
+   start - Start learning vocabulary
+   help - Get help and usage instructions
+   ```
+
+## Bot Polling Setup
+
+**Important**: This bot requires a separate polling service to receive messages from Telegram.
+
+### Why Bot Polling is Needed
+
+The main application uses webhooks for production, but for development and some deployment scenarios, you need a polling service that:
+- Continuously checks for new messages from Telegram
+- Forwards them to your main application
+- Handles the connection management
+
+### Setting Up Bot Polling
+
+1. **Clone the bot polling repository** (in a separate directory):
+   ```bash
+   # Navigate to your projects directory (not inside tg_bot)
+   cd ../
+   git clone https://github.com/andrewvect/bot_polling
+   cd bot_polling
+   ```
+
+2. **Build the polling container**:
+   ```bash
+   docker build -t bot_polling_image .
+   ```
+
+3. **Run the polling container** with access to your `.env` file:
+   ```bash
+   docker run -d --name bot_polling \
+       -v $(pwd)/../tg_bot/.env:/app/.env \
+       --network host \
+       bot_polling_image
+   ```
+
+4. **Verify it's running**:
+   ```bash
+   docker ps | grep bot_polling
+   docker logs bot_polling
+   ```
+
+### Bot Polling Troubleshooting
+
+If the bot doesn't respond to messages:
+- Check if the polling container is running: `docker ps`
+- Check the logs: `docker logs bot_polling`
+- Verify your `BOT_TOKEN` is correct in the `.env` file
+- Ensure the main application is accessible on `localhost:8000`
 
 ## Docker Compose
 
-* Start the local stack with Docker Compose:
+### Starting the Development Environment
+
+Start the local stack with Docker Compose:
 
 ```bash
 docker compose watch
 ```
 
-* Now you can open your telegram and interact with the bot.:
+This command will:
+- Build and start all services (backend, frontend, database, etc.)
+- Watch for changes and automatically rebuild/restart as needed
+- Set up all necessary networks and volumes
 
-* In browser, you can interact with the services:
+### Accessing the Services
 
-Backend, JSON based web API based on OpenAPI: http://localhost:8000
+Once started, you can access:
 
-Automatic interactive documentation with Swagger UI (from the OpenAPI backend): http://localhost:8000/docs
+- **Backend API**: http://localhost:8000
+- **API Documentation (Swagger)**: http://localhost:8000/docs
+- **Alternative API Docs (ReDoc)**: http://localhost:8000/redoc
+- **Frontend Web App**: http://localhost:5173
+- **Database Admin (Adminer)**: http://localhost:8080
+- **Traefik Dashboard**: http://localhost:8090
+- **MailCatcher** (if configured): http://localhost:1080
 
-Adminer, database web administration: http://localhost:8080
+### First Startup
 
-Traefik UI, to see how the routes are being handled by the proxy: http://localhost:8090
+**Note**: The first time you start your stack, it might take a few minutes to be ready while:
+- Docker downloads and builds images
+- The database initializes
+- The backend waits for the database and configures everything
+- Dependencies are installed
 
-**Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
+### Monitoring the Startup
 
-To check the logs, run (in another terminal):
+To check the logs and monitor the startup process:
 
 ```bash
+# View logs from all services
 docker compose logs
+
+# Follow logs in real-time
+docker compose logs -f
+
+# Check logs for a specific service
+docker compose logs backend
+docker compose logs frontend
+docker compose logs db
 ```
 
-To check the logs of a specific service, add the name of the service, e.g.:
+### Testing Your Bot
+
+1. **Start the bot polling service** (see Bot Polling Setup above)
+2. **Open Telegram** and find your bot
+3. **Send `/start`** to your bot
+4. **Click "Открыть приложение"** to open the web interface
+5. **Start learning!** Try adding words and testing the spaced repetition system
+
+## Troubleshooting
+
+### Common Development Issues
+
+#### Bot Not Responding
+
+**Problem**: Bot doesn't respond to Telegram messages
+
+**Solutions**:
+1. **Check bot polling service**:
+   ```bash
+   docker ps | grep bot_polling  # Should show running container
+   docker logs bot_polling       # Check for errors
+   ```
+
+2. **Verify bot token**:
+   ```bash
+   grep BOT_TOKEN .env  # Ensure it's set correctly
+   ```
+
+3. **Check main application**:
+   ```bash
+   curl http://localhost:8000/health  # Should return OK
+   docker compose logs backend        # Check backend logs
+   ```
+
+4. **Restart services**:
+   ```bash
+   docker restart bot_polling
+   docker compose restart backend
+   ```
+
+#### Database Connection Issues
+
+**Problem**: Database connection errors or migrations failing
+
+**Solutions**:
+1. **Check database status**:
+   ```bash
+   docker compose ps db           # Should show healthy
+   docker compose logs db         # Check database logs
+   ```
+
+2. **Wait for database initialization**:
+   ```bash
+   # Database needs time to initialize on first run
+   docker compose logs db | grep "ready to accept connections"
+   ```
+
+3. **Reset database** (if needed):
+   ```bash
+   docker compose down -v  # Warning: This deletes all data
+   docker compose up -d db
+   ```
+
+#### Frontend Not Loading
+
+**Problem**: Frontend shows blank page or errors
+
+**Solutions**:
+1. **Check frontend service**:
+   ```bash
+   docker compose logs frontend
+   curl http://localhost:5173
+   ```
+
+2. **Verify environment variables**:
+   ```bash
+   grep DOMAIN .env
+   grep FRONTEND_HOST .env
+   ```
+
+3. **Clear browser cache** and try again
+
+4. **Rebuild frontend**:
+   ```bash
+   docker compose build frontend
+   docker compose up -d frontend
+   ```
+
+#### Permission Errors
+
+**Problem**: Permission denied errors with Docker or file access
+
+**Solutions**:
+1. **Fix file ownership**:
+   ```bash
+   sudo chown -R $USER:$USER .
+   ```
+
+2. **Add user to docker group**:
+   ```bash
+   sudo usermod -aG docker $USER
+   # Log out and log back in
+   ```
+
+#### Port Already in Use
+
+**Problem**: "Port already in use" errors
+
+**Solutions**:
+1. **Check what's using the port**:
+   ```bash
+   sudo lsof -i :8000  # Check port 8000
+   sudo lsof -i :5173  # Check port 5173
+   ```
+
+2. **Stop conflicting services**:
+   ```bash
+   docker compose down
+   # Kill specific processes if needed
+   ```
+
+3. **Change ports in docker-compose.override.yml** if needed
+
+### Development Tips
+
+#### Viewing Logs Effectively
 
 ```bash
-docker compose logs backend
+# Follow logs from all services with timestamps
+docker compose logs -f -t
+
+# Filter logs for specific patterns
+docker compose logs backend | grep ERROR
+docker compose logs | grep -i webhook
+
+# View logs for the last 10 minutes
+docker compose logs --since 10m
 ```
+
+#### Database Management
+
+```bash
+# Access database directly
+docker compose exec db psql -U postgres -d app
+
+# Run database migrations
+docker compose exec backend alembic upgrade head
+
+# Create new migration
+docker compose exec backend alembic revision --autogenerate -m "description"
+```
+
+#### Working with Bot Content
+
+```bash
+# Edit bot messages
+nano backend/content.yaml
+
+# The content is automatically reloaded when the backend restarts
+docker compose restart backend
+```
+
+### Getting Help
+
+If you're still having issues:
+
+1. **Check the logs** for specific error messages
+2. **Search the repository issues** on GitHub
+3. **Create a new issue** with:
+   - Your operating system
+   - Docker and Docker Compose versions
+   - Complete error messages
+   - Steps to reproduce the problem
+
+## Contributing to Development
+
+### Making Changes
+
+1. **Fork the repository** and create a feature branch:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make your changes** following the project conventions:
+   - Backend: Follow FastAPI and SQLAlchemy best practices
+   - Frontend: Use TypeScript and follow React patterns
+   - Bot: Update content.yaml for message changes
+
+3. **Test your changes**:
+   ```bash
+   # Backend tests
+   docker compose exec backend bash scripts/tests-start.sh
+   
+   # Frontend tests
+   cd frontend && npx playwright test
+   
+   # Manual testing with your bot
+   ```
+
+4. **Commit and push**:
+   ```bash
+   git add .
+   git commit -m "feat: add your feature description"
+   git push origin feature/your-feature-name
+   ```
+
+5. **Create a Pull Request** with a clear description of your changes
+
+### Code Style
+
+- **Python**: Code is automatically formatted with `ruff`
+- **TypeScript/React**: Code is formatted with `prettier` and linted with `eslint`
+- **Commits**: Use conventional commit messages (feat:, fix:, docs:, etc.)
+- **Pre-commit hooks**: Install with `uv run pre-commit install`
+
+### Development Guidelines
+
+- **Keep it simple**: Make minimal changes that solve specific problems
+- **Test thoroughly**: Ensure your changes don't break existing functionality
+- **Document changes**: Update relevant documentation files
+- **Follow patterns**: Maintain consistency with existing code structure
 
 ## Local Development
 
