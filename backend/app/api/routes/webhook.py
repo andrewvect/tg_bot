@@ -2,12 +2,13 @@
 
 from typing import TypedDict
 
-from aiogram import Bot, types
+from aiogram import types
 from aiogram.client.telegram import TEST
 from fastapi import APIRouter, Request, Response
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from app.api.bot.main import dispatcher
+from app.api.deps import BotDep
 from app.core.config import settings
 from app.utils.logger import logger
 
@@ -26,11 +27,12 @@ class TransferData(TypedDict):
 
 
 @router.post("/")
-async def webhook(request: Request) -> Response:
+async def webhook(request: Request, bot: BotDep) -> Response:
     """Handle incoming updates from Telegram bot.
 
     Args:
         request: FastAPI request object containing the update from Telegram
+        bot: Bot instance injected via dependency
 
     Returns:
         Response with appropriate status code
@@ -38,7 +40,6 @@ async def webhook(request: Request) -> Response:
     update = await request.json()
     update = types.Update(**update)
 
-    bot = Bot(token=settings.BOT_TOKEN)
     # Use telegram test environment
     if settings.TELEGRAM_TESTING:
         # For local testing, set the bot to TEST mode
