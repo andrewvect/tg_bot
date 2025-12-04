@@ -2,10 +2,11 @@ import datetime
 import logging
 from collections.abc import AsyncGenerator, Generator
 from typing import Any
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 import pytest_asyncio
+from aiogram import Bot
 from faker import Faker
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import Engine, create_engine
@@ -18,7 +19,7 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import NullPool
 
-from app.api.deps import get_session, get_tokens_service
+from app.api.deps import get_bot_instance, get_session, get_tokens_service
 from app.common.cache.states import UserProfile, users_states
 from app.common.db.models import Base, Card, Sentence, Settings, User, Word
 from app.core.config import settings
@@ -251,6 +252,15 @@ def override_app_session(test_app: Any, async_db_session: AsyncSession) -> Gener
     test_app.dependency_overrides[get_session] = lambda: async_db_session
     yield
     test_app.dependency_overrides = {}
+
+
+@pytest.fixture(scope="function")
+def mock_bot():
+    """Create a mock Bot instance for testing webhook endpoints."""
+    mock = AsyncMock(spec=Bot)
+    mock.session = AsyncMock()
+    mock.session.api = AsyncMock()
+    return mock
 
 
 @pytest_asyncio.fixture(scope="function")
