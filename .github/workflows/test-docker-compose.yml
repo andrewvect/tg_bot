@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Inject BOT_TOKEN from GitHub Secrets into .env
         run: |
           sed -i 's|^BOT_TOKEN=.*|BOT_TOKEN=${{ secrets.BOT_TOKEN }}|' .env
