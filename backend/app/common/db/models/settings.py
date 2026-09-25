@@ -41,10 +41,21 @@ class Settings(Base):
         default=1,
     )
 
+    start_word_rank: Mapped[int] = mapped_column(
+        sa.Integer,
+        nullable=False,
+        default=0,
+    )
+    """ Word frequency rank the user chose to start learning from (their
+    "level"): 0 means the beginning, 1000/2000/... skips ahead. """
+
     # Constrains
     __table_args__ = (
         CheckConstraint(
             "spoiler_settings IN (0, 1, 2, 3, 4)", name="check_spoiler_settings"
+        ),
+        CheckConstraint(
+            "start_word_rank >= 0", name="check_start_word_rank_non_negative"
         ),
     )
     """ Ensure spoiler_settings"""

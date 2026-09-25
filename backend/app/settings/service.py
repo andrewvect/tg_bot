@@ -27,6 +27,7 @@ class SettingService:
         if self._check_differece(user, request):
             user.spoiler_settings = request.spoiler_settings
             user.alphabet_settings = request.alphabet_settings
+            user.start_word_rank = request.start_word_rank
             user = await self.repository.update(user)
         return user
 
@@ -34,4 +35,5 @@ class SettingService:
         return (
             user.spoiler_settings != request.spoiler_settings
             or user.alphabet_settings != request.alphabet_settings
+            or user.start_word_rank != request.start_word_rank
         )

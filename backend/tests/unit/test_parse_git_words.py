@@ -216,9 +216,10 @@ class TestGitWordParser:
                 mock_session_instance = MagicMock()
                 mock_session.return_value.__enter__.return_value = mock_session_instance
 
-                # Create mock words for get method
+                # Create mock words for the rank lookup
                 word1 = Word(
                     id=1,
+                    rank=1,
                     native_word="old_one",
                     latin_word="jedan",
                     cyrillic_word="old_cyrillic_1",
@@ -228,6 +229,7 @@ class TestGitWordParser:
 
                 word2 = Word(
                     id=2,
+                    rank=2,
                     native_word="two",
                     latin_word="dva",
                     cyrillic_word="два",
@@ -242,15 +244,16 @@ class TestGitWordParser:
                 )
                 word2.sentences = [sentence]
 
-                # Mock session.get to return appropriate word based on ID
-                def mock_get(cls, id):  # noqa
-                    if id == 1:
-                        return word1
-                    elif id == 2:
-                        return word2
-                    return None
-
-                mock_session_instance.get = mock_get
+                # Mock session.execute(...).scalar_one_or_none() to return the
+                # word matching each rank, in the order the loop queries them.
+                result_for_word1 = MagicMock()
+                result_for_word1.scalar_one_or_none.return_value = word1
+                result_for_word2 = MagicMock()
+                result_for_word2.scalar_one_or_none.return_value = word2
+                mock_session_instance.execute.side_effect = [
+                    result_for_word1,
+                    result_for_word2,
+                ]
 
                 with patch.object(
                     parser, "create_db_connection", return_value=mock_session
@@ -294,8 +297,8 @@ class TestGitWordParser:
                 mock_session_instance = MagicMock()
                 mock_session.return_value.__enter__.return_value = mock_session_instance
 
-                # Mock session.get to return None (word not found)
-                mock_session_instance.get.return_value = None
+                # Mock session.execute(...).scalar_one_or_none() to return None (word not found)
+                mock_session_instance.execute.return_value.scalar_one_or_none.return_value = None
 
                 with patch.object(
                     parser, "create_db_connection", return_value=mock_session
@@ -333,6 +336,7 @@ class TestGitWordParser:
                 # Create mock word
                 word = Word(
                     id=1,
+                    rank=1,
                     native_word="one",
                     latin_word="jedan",
                     cyrillic_word="један",
@@ -340,7 +344,7 @@ class TestGitWordParser:
                 )
                 word.sentences = []
 
-                mock_session_instance.get.return_value = word
+                mock_session_instance.execute.return_value.scalar_one_or_none.return_value = word
 
                 with patch.object(
                     parser, "create_db_connection", return_value=mock_session
@@ -373,13 +377,14 @@ class TestGitWordParser:
                 # Create mock word
                 word = Word(
                     id=1,
+                    rank=1,
                     native_word="old_one",
                     latin_word="jedan",
                     cyrillic_word="old_cyrillic",
                     legend="old_bio",
                 )
 
-                mock_session_instance.get.return_value = word
+                mock_session_instance.execute.return_value.scalar_one_or_none.return_value = word
                 mock_session_instance.commit.side_effect = SQLAlchemyError(
                     "Database error"
                 )

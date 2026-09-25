@@ -7,6 +7,7 @@ from app.common.cache.states import UserProfile
 from app.common.db.database import Database
 from app.common.db.models import Word
 from app.common.db.models.card import Card
+from app.settings.service import SettingService
 
 
 class EndWordsInDb(Exception):
@@ -29,10 +30,30 @@ class WordCardHandler:
         review_algorithm: Callable[
             [int, bool, datetime.datetime | None], datetime.datetime
         ],
+        settings_service: SettingService,
     ):
         self.db = db
         self.cache = cache
         self.review_algorithm = review_algorithm
+        self.settings_service = settings_service
+
+    async def _get_min_rank(self, user_id: int) -> int:
+        """Lowest rank the user has already unlocked.
+
+        This is the higher of: the rank of the last word they created a
+        card for, and their chosen starting level (Settings.start_word_rank)
+        - so picking a level jumps them ahead, but never rewinds progress
+        they've already made past it.
+        """
+        user_settings = await self.settings_service.get_user_settings(user_id)
+        starting_rank = user_settings.start_word_rank
+
+        if len(self.cache[user_id].created_cards) == 0:
+            return starting_rank
+
+        latest_word = await self.db.word.get(self.cache[user_id].created_cards[-1])
+        latest_rank = latest_word.rank if latest_word else 0
+        return max(latest_rank, starting_rank)
 
     async def create_new_card(
         self, telegram_id: int, known: bool, word_id: int
@@ -42,9 +63,13 @@ class WordCardHandler:
         if word_id in self.cache[telegram_id].created_cards:
             raise ValueError("Word card already created")
 
-        if word_id != 1 and len(self.cache[telegram_id].created_cards) == 0:
-            if word_id != self.cache[telegram_id].created_cards[-1] + 1:
-                raise ValueError("Word card not in sequence")
+        word = await self.db.word.get(word_id)
+        if word is None:
+            raise ValueError("Word not found")
+
+        min_rank = await self._get_min_rank(telegram_id)
+        if word.rank != min_rank + 1:
+            raise ValueError("Word card not in sequence")
 
         if known is True:
             count_of_views = 20
@@ -66,14 +91,9 @@ class WordCardHandler:
     async def get_new_words(self, user_id: int, limit: int = 20) -> list[Word]:
         """Get new words for user"""
 
-        if len(self.cache[user_id].created_cards) == 0:
-            latest_word_id = 0
-        else:
-            latest_word_id = self.cache[user_id].created_cards[-1]
+        min_rank = await self._get_min_rank(user_id)
 
-        words = await self.db.word.get_new_words(
-            limit=limit, last_word_id=latest_word_id
-        )
+        words = await self.db.word.get_new_words(limit=limit, min_rank=min_rank)
         if not words:
             raise EndWordsInDb("No more words in database")
         return words
