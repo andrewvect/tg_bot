@@ -1,18 +1,21 @@
 """Webhook routes for handling Telegram bot updates."""
 
+import secrets
 from typing import TypedDict
 
 from aiogram import types
 from aiogram.client.telegram import TEST
 from fastapi import APIRouter, Request, Response
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.api.bot.main import dispatcher
-from app.api.deps import BotDep
+from app.api.deps import BotDep, engine
 from app.core.config import settings
 from app.utils.logger import logger
 
 router = APIRouter(prefix="/webhook", tags=["webhook"])
+
+TELEGRAM_SECRET_TOKEN_HEADER = "X-Telegram-Bot-Api-Secret-Token"
 
 
 class TransferData(TypedDict):
@@ -37,6 +40,11 @@ async def webhook(request: Request, bot: BotDep) -> Response:
     Returns:
         Response with appropriate status code
     """
+    received_secret = request.headers.get(TELEGRAM_SECRET_TOKEN_HEADER, "")
+    if not secrets.compare_digest(received_secret, settings.TELEGRAM_WEBHOOK_SECRET):
+        logger.warning("Rejected webhook request with invalid secret token")
+        return Response(status_code=401)
+
     update = await request.json()
     update = types.Update(**update)
 
@@ -51,13 +59,7 @@ async def webhook(request: Request, bot: BotDep) -> Response:
             config=settings,
             **TransferData(
                 logger=logger,
-                engine=create_async_engine(
-                    url=settings.ASYNC_SQLALCHEMY_DATABASE_URI,
-                    pool_size=10,
-                    max_overflow=5,
-                    pool_timeout=30,
-                    pool_recycle=1800,
-                ),
+                engine=engine,
                 redis_url="redis://localhost:6379/0",  # Providing a value for redis_url
                 role=0,  # Providing a default value for role
             ),

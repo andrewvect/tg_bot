@@ -88,6 +88,9 @@ class Settings(BaseSettings):
     BOT_TOKEN: str
     TELEGRAM_TESTING: bool
     URL_TO_GIT_FILES: AnyUrl | None = None
+    # Secret Telegram sends back in the X-Telegram-Bot-Api-Secret-Token header
+    # so the webhook can verify updates actually came from Telegram.
+    TELEGRAM_WEBHOOK_SECRET: str = secrets.token_urlsafe(32)
 
     @computed_field
     @property
