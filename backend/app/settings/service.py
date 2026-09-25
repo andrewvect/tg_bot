@@ -1,10 +1,10 @@
 from app.common.db.models import Settings
-from app.common.db.repositories import SettingsRepo
+from app.common.db.repositories import SettingsRepoProtocol
 from app.schemas.settings import SettingsUpdateRequest
 
 
 class SettingService:
-    def __init__(self, repository: SettingsRepo):
+    def __init__(self, repository: SettingsRepoProtocol):
         self.repository = repository
 
     async def get_user_settings(self, user_id: int) -> Settings:

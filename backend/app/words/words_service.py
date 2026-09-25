@@ -1,13 +1,25 @@
 import datetime
 from collections.abc import Callable
+from typing import Protocol
 
 from sqlalchemy.orm import joinedload
 
 from app.common.cache.states import UserProfile
-from app.common.db.database import Database
 from app.common.db.models import Word
 from app.common.db.models.card import Card
-from app.settings.service import SettingService
+from app.common.db.repositories import CardRepoProtocol, WordRepoProtocol
+from app.settings.interfaces import SettingsServiceProtocol
+
+
+class WordCardHandlerDatabase(Protocol):
+    """The narrow slice of Database that WordCardHandler actually uses.
+
+    Defined here, next to its consumer, rather than as a full interface for
+    the Database facade - it only ever touches .word and .card.
+    """
+
+    word: WordRepoProtocol
+    card: CardRepoProtocol
 
 
 class EndWordsInDb(Exception):
@@ -25,12 +37,12 @@ class EndWordsToReview(Exception):
 class WordCardHandler:
     def __init__(
         self,
-        db: Database,
+        db: WordCardHandlerDatabase,
         cache: dict[int, UserProfile],
         review_algorithm: Callable[
             [int, bool, datetime.datetime | None], datetime.datetime
         ],
-        settings_service: SettingService,
+        settings_service: SettingsServiceProtocol,
     ):
         self.db = db
         self.cache = cache

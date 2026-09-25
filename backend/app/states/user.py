@@ -1,5 +1,6 @@
 from collections.abc import Callable, Sequence
 from datetime import datetime, timedelta
+from typing import Protocol
 
 from sortedcontainers import SortedDict, SortedList  # type: ignore
 
@@ -7,7 +8,15 @@ from app.api.deps import async_session_factory
 from app.common.cache.states import UserProfile, users_states
 from app.common.db import Database
 from app.common.db.models.card import Card
+from app.common.db.repositories import CardRepoProtocol, UserRepoProtocol
 from app.common.db.repositories.user import NoUsersFound
+
+
+class StatesCreatorDatabase(Protocol):
+    """The narrow slice of Database that StatesCreator actually uses."""
+
+    user: UserRepoProtocol
+    card: CardRepoProtocol
 
 
 def review_algorithm(
@@ -46,7 +55,7 @@ class StatesCreator:
 
     def __init__(
         self,
-        db: Database,
+        db: StatesCreatorDatabase,
         review_func: Callable[[datetime, int, bool], datetime],
         cache: dict[int, UserProfile],
     ) -> None:
