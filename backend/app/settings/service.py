@@ -1,10 +1,10 @@
 from app.common.db.models import Settings
-from app.common.db.repositories import SettingsRepo
+from app.common.db.repositories import SettingsRepoProtocol
 from app.schemas.settings import SettingsUpdateRequest
 
 
 class SettingService:
-    def __init__(self, repository: SettingsRepo):
+    def __init__(self, repository: SettingsRepoProtocol):
         self.repository = repository
 
     async def get_user_settings(self, user_id: int) -> Settings:
@@ -27,6 +27,7 @@ class SettingService:
         if self._check_differece(user, request):
             user.spoiler_settings = request.spoiler_settings
             user.alphabet_settings = request.alphabet_settings
+            user.start_word_rank = request.start_word_rank
             user = await self.repository.update(user)
         return user
 
@@ -34,4 +35,5 @@ class SettingService:
         return (
             user.spoiler_settings != request.spoiler_settings
             or user.alphabet_settings != request.alphabet_settings
+            or user.start_word_rank != request.start_word_rank
         )

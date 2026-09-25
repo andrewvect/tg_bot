@@ -1,7 +1,7 @@
 """Word model file."""
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -15,6 +15,15 @@ class Word(Base):
     """Word model representing a word with translations, images, and related data."""
 
     # Fields
+
+    # Frequency rank of the word (1 = most common), independent of the
+    # primary key `id`. This is what lets a user pick a starting level
+    # ("start from word 1000/2000/...") and what the import script assigns
+    # from the source word lists, instead of overloading the PK for that.
+    rank: Mapped[int] = mapped_column(
+        Integer, unique=True, nullable=False, index=True
+    )
+
     latin_word: Mapped[str] = mapped_column(
         String(100), unique=True, nullable=False, index=True
     )

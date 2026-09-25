@@ -28,7 +28,9 @@ async def set_telegram_webhook(bot: Bot) -> bool:
         "https://" + "api." + settings.DOMAIN + settings.API_V1_STR + "/webhook"
     )
     try:
-        result = await bot.set_webhook(url=webhook_url)
+        result = await bot.set_webhook(
+            url=webhook_url, secret_token=settings.TELEGRAM_WEBHOOK_SECRET
+        )
         if result:
             logger.info(f"Webhook set successfully {webhook_url}")
             return True

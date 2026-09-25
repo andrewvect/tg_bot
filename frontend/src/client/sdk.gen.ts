@@ -24,7 +24,7 @@ export class HealthCheckService {
   /**
    * Health Check
    * Health check endpoint.
-   * @returns unknown Successful Response
+   * @returns string Successful Response
    * @throws ApiError
    */
   public static healthCheck(): CancelablePromise<HealthCheckHealthCheckResponse> {
@@ -145,7 +145,7 @@ export class UtilsService {
 
   /**
    * Add Review
-   * Add review to word card
+   * Add review to word card with idempotency support
    * @param data The data for the request.
    * @param data.requestBody
    * @returns ReviewResponse Successful Response
@@ -186,6 +186,7 @@ export class WebhookService {
    *
    * Args:
    * request: FastAPI request object containing the update from Telegram
+   * bot: Bot instance injected via dependency
    *
    * Returns:
    * Response with appropriate status code

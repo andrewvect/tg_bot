@@ -9,10 +9,10 @@ from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
 from idempotency_header_middleware import IdempotencyHeaderMiddleware
-from idempotency_header_middleware.backends import MemoryBackend
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
+from app.common.cache.idempotency_backend import BoundedMemoryBackend
 from app.core.config import settings
 from app.scripts.set_up_bot import set_up_bot as set_telegram_bot
 from app.states import get_users_states
@@ -107,10 +107,12 @@ def create_app() -> FastAPI:
             allow_headers=["*"],
         )
 
-    # Add idempotency middleware with memory backend
+    # Add idempotency middleware with a bounded memory backend (see
+    # BoundedMemoryBackend docstring: the upstream MemoryBackend leaks memory
+    # unboundedly on unauthenticated routes like /login and /webhook).
     app.add_middleware(
         IdempotencyHeaderMiddleware,
-        backend=MemoryBackend(),
+        backend=BoundedMemoryBackend(),
     )
 
     app.include_router(api_router, prefix=settings.API_V1_STR)

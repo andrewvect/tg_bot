@@ -135,7 +135,11 @@ async def test_add_success_review(
 
     response = await client.patch(
         "api/v1/cards/review/",
-        json={"passed": True, "word_id": db_with_cards[0].word_id},
+        json={
+            "passed": True,
+            "word_id": db_with_cards[0].word_id,
+            "idempotency_key": str(uuid.uuid4()),
+        },
         headers={"Authorization": "Bearer some_token"},
     )
 
@@ -161,6 +165,38 @@ async def test_add_success_review(
 
 
 @pytest.mark.asyncio
+async def test_review_count_after_passed_review_does_not_crash(
+    client,
+    test_user,  # noqa
+    db_with_cards,
+    db_session,  # noqa
+    cache_with_created_cards,  # noqa
+    mock_tokens_service,  # noqa
+):
+    """A passed review stores a waiting_cards entry; fetching the review
+    count afterwards must not crash on that entry (regression test for a
+    datetime/int key type mismatch between add_review and
+    _refresh_user_reviews)."""
+
+    review_response = await client.patch(
+        "api/v1/cards/review/",
+        json={
+            "passed": True,
+            "word_id": db_with_cards[0].word_id,
+            "idempotency_key": str(uuid.uuid4()),
+        },
+        headers={"Authorization": "Bearer some_token"},
+    )
+    assert review_response.status_code == 201
+
+    count_response = await client.get(
+        "api/v1/cards/review/count",
+        headers={"Authorization": "Bearer some_token"},
+    )
+    assert count_response.status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_add_fail_review(
     client,
     test_user,
@@ -173,7 +209,11 @@ async def test_add_fail_review(
 
     response = await client.patch(
         "api/v1/cards/review/",
-        json={"passed": False, "word_id": db_with_cards[0].word_id},
+        json={
+            "passed": False,
+            "word_id": db_with_cards[0].word_id,
+            "idempotency_key": str(uuid.uuid4()),
+        },
         headers={"Authorization": "Bearer some_token"},
     )
 

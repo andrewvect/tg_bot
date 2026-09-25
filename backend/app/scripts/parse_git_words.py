@@ -1,7 +1,7 @@
 """Script for upload words from git to database"""
 import requests  # type: ignore
 import yaml
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -43,11 +43,11 @@ class GitWordParser:
         parsed_data = yaml.safe_load(words_text)
         Session = self.create_db_connection()
         with Session() as session:
-            for id, item in parsed_data.items():
+            for rank, item in parsed_data.items():
                 word_data = Word(
-                    id=id,
+                    rank=rank,
                     native_word=item["translation"],
-                    foreign_word=item["serbian_word"]["Latin"],
+                    latin_word=item["serbian_word"]["Latin"],
                     cyrillic_word=item["serbian_word"]["Cyrillic"],
                 )
                 try:
@@ -65,14 +65,16 @@ class GitWordParser:
         sentences_count = 0
         Session = self.create_db_connection()
         with Session() as session:
-            for id, item in parsed_data.items():
+            for rank, item in parsed_data.items():
                 try:
-                    # Update word based on the Serbian Latin value as unique identifier.
-                    existing_word = session.get(Word, id)
+                    # Update word based on its frequency rank (the yaml key).
+                    existing_word = session.execute(
+                        select(Word).where(Word.rank == rank)
+                    ).scalar_one_or_none()
 
                     # Skip if word doesn't exist
                     if existing_word is None:
-                        logger.warning(f"Word with ID {id} not found in database")
+                        logger.warning(f"Word with rank {rank} not found in database")
                         continue
 
                     if (
@@ -104,7 +106,7 @@ class GitWordParser:
                                 cyrillic_text = sentence_data["Cyrillic"]
                                 native_text = sentence_data["Russian"]
                             except TypeError:
-                                print(
+                                logger.error(
                                     f"Error processing sentence data: {sentence_data}"
                                 )
                                 break
