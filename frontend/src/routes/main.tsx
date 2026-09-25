@@ -1,8 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Button, VStack, Container, Box, AbsoluteCenter, Circle } from "@chakra-ui/react"
 import BackgroundBox from '../components/back'
-import { useEffect, useState } from 'react'
-import { UtilsService } from '../client/sdk.gen'
+import { useMainMenuPresenter } from '../presenters/useMainMenuPresenter'
 
 export const Route = createFileRoute('/main')({
     component: () => <Main />,
@@ -10,20 +9,7 @@ export const Route = createFileRoute('/main')({
 
 function Main() {
     const navigate = useNavigate()
-    const [reviewCount, setReviewCount] = useState<string>('0')
-
-    useEffect(() => {
-        const token = localStorage.getItem('token')
-        if (token) {
-            UtilsService.getReviewWordsCount()
-            .then(response => {
-                const count = response ?? 0;
-                const reviewWordsCount = String(count);
-                setReviewCount(reviewWordsCount);
-            })
-            .catch(error => console.error('Error fetching word count:', error))
-        }
-    }, [])
+    const { reviewCount } = useMainMenuPresenter()
 
     return (
         <BackgroundBox>
