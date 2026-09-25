@@ -12,10 +12,15 @@ export const Route = createFileRoute('/settings')({
     component: NewWord,
 })
 
+// Starting levels offered to the user: word frequency-rank bands the word
+// list is imported in (see backend/app/scripts/parse_git_words.py files).
+const START_WORD_RANK_OPTIONS = [0, 1000, 2000, 3000]
+
 function NewWord() {
     const navigate = useNavigate()
     const [displaySetting, setDisplaySetting] = useState('4') // Default value
     const [alphabetSetting, setAlphabetSetting] = useState('4') // Default value
+    const [startWordRank, setStartWordRank] = useState('0') // Default value
     const [loading, setLoading] = useState(true) // New loading state
 
     useEffect(() => {
@@ -23,21 +28,29 @@ function NewWord() {
             .then((res: SettingsGetUserSettingsResponse) => {
                 setDisplaySetting(String(res.spoiler_settings))
                 setAlphabetSetting(String(res.alphabet_settings))
+                setStartWordRank(String(res.start_word_rank))
             })
             .catch(err => console.error(err))
             .finally(() => setLoading(false)) // Set loading to false after fetching
     }, [])
 
-    const handleChange = async (spoilerSettingValue?: string, alphabetSettingsValue?: string) => {
+    const handleChange = async (
+        spoilerSettingValue?: string,
+        alphabetSettingsValue?: string,
+        startWordRankValue?: string,
+    ) => {
         const newDisplay = spoilerSettingValue !== undefined ? spoilerSettingValue : displaySetting;
         const newAlphabet = alphabetSettingsValue !== undefined ? alphabetSettingsValue : alphabetSetting;
+        const newStartWordRank = startWordRankValue !== undefined ? startWordRankValue : startWordRank;
         setDisplaySetting(newDisplay);
         setAlphabetSetting(newAlphabet);
+        setStartWordRank(newStartWordRank);
         try {
             await SettingsService.setUserSettings({
                 requestBody: {
                     spoiler_settings: Number(newDisplay),
                     alphabet_settings: Number(newAlphabet),
+                    start_word_rank: Number(newStartWordRank),
                 }
             });
         } catch (err) {
@@ -92,6 +105,21 @@ function NewWord() {
                                         <Radio value="1" colorScheme="whiteAlpha">
                                             <Text fontSize="2xl" color="white">Оба</Text>
                                         </Radio>
+                                    </Stack>
+                                </RadioGroup>
+                                <Text fontSize="3xl" fontWeight="bold" color="white">Начать со слова</Text>
+                                <RadioGroup
+                                    value={startWordRank}
+                                    onChange={(value) => handleChange(undefined, undefined, value)}
+                                >
+                                    <Stack direction="column">
+                                        {START_WORD_RANK_OPTIONS.map((rank) => (
+                                            <Radio key={rank} value={String(rank)} colorScheme="whiteAlpha">
+                                                <Text fontSize="2xl" color="white">
+                                                    {rank === 0 ? 'С начала' : `Со слова №${rank}`}
+                                                </Text>
+                                            </Radio>
+                                        ))}
                                     </Stack>
                                 </RadioGroup>
                             </Stack>

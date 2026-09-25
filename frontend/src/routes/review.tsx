@@ -31,7 +31,8 @@ async function submitReview(data: { passed: boolean; word_id: number }): Promise
     await UtilsService.addReview({
         requestBody: {
             passed: data.passed,
-            word_id: data.word_id
+            word_id: data.word_id,
+            idempotency_key: crypto.randomUUID(),
         }
     })
 }
