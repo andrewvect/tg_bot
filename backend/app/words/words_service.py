@@ -117,9 +117,8 @@ class WordCardHandler:
 
         if passed:
             card = await self.db.card.add_review(user_id=user_id, word_id=word_id)
-            self.cache[user_id].waiting_cards[
-                self.review_algorithm(card.count_of_views, False, None)
-            ] = word_id
+            next_review = self.review_algorithm(card.count_of_views, False, None)
+            self.cache[user_id].waiting_cards[int(next_review.timestamp())] = word_id
 
         else:
             self.cache[user_id].review_cards.append(word_id)
