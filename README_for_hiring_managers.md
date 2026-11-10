@@ -7,6 +7,7 @@
     - 🧰 [SQLAlchemy](https://www.sqlalchemy.org) for the Python SQL database interactions (ORM).
     - 🔍 [Pydantic](https://docs.pydantic.dev), used by FastAPI, for the data validation and settings management.
     - 💾 [PostgreSQL](https://www.postgresql.org) as the SQL database.
+    - 📨 [**Apache Kafka**](https://kafka.apache.org/) event-driven message queue via [aiokafka](https://github.com/aio-libs/aiokafka) for asynchronous card reviews, progress tracking, and decoupled worker processing.
     - ✅ Tests with [Pytest](https://pytest.org).
     - 🔑 JWT (JSON Web Token) authentication.
     - 📨 [Aiogram](https://aiogram.dev) for Telegram bot development.
@@ -22,6 +23,7 @@
 ### Infrastructure
 
 - 🐋 [Docker Compose](https://www.docker.com) for development and production.
+- 📬 [Apache Kafka](https://kafka.apache.org/) (KRaft mode) & asynchronous Kafka worker service container.
 - 📞 [Traefik](https://traefik.io) as a reverse proxy / load balancer.
 - 🚢 Deployment instructions using Docker Compose, including how to set up a frontend Traefik proxy to handle automatic HTTPS certificates.
 - 📱 [Telegram API](https://core.telegram.org/bots/api) integration

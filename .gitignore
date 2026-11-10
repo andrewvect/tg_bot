@@ -19,3 +19,8 @@ backend/app/.DS_Store
 serbian_words_with_counts.txt
 words copy.yaml
 words.yaml
+*.log
+logs/
+backend/logs/
+.venv/
+

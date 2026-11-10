@@ -18,6 +18,7 @@ from app.common.cache.states import UserProfile, idempotency_store
 from app.common.db import Database
 from app.common.db.repositories import SettingsRepo
 from app.core.config import settings
+from app.kafka import KafkaEventProducer, kafka_producer
 from app.settings.service import SettingService
 from app.token_service import TokensService
 from app.utils.review_algoritm import review_algorithm
@@ -74,8 +75,14 @@ def get_idempotency_store() -> IdempotencyStore:
     return idempotency_store
 
 
-IdempotencyStoreDep = Annotated[IdempotencyStore,
-                                Depends(get_idempotency_store)]
+IdempotencyStoreDep = Annotated[IdempotencyStore, Depends(get_idempotency_store)]
+
+
+def get_kafka_producer() -> KafkaEventProducer:
+    return kafka_producer
+
+
+KafkaProducerDep = Annotated[KafkaEventProducer, Depends(get_kafka_producer)]
 
 
 def get_tokens_service() -> TokensService:

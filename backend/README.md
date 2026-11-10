@@ -5,6 +5,7 @@ The backend build with clean architecture in mind, with the following layers:
 - **API**: The API layer is built with FastAPI, which provides a modern and fast web framework for building APIs with Python 3.6+ based on standard Python type hints.
 - **Database**: The database layer uses SQLModel for ORM capabilities, allowing for easy interaction with the database.
 - **Services**: The services layer contains the business logic and interacts with both the API and database layers.
+- **Message Queue (Apache Kafka)**: Event-driven architecture with asynchronous event streaming for flashcard creation and review events (`aiokafka`).
 - **Tests**: The tests layer includes unit and integration tests to ensure the reliability of the application.
 
 ## Database
@@ -14,6 +15,19 @@ The database schema is visualized below:
 ![Database Schema](diagrams/database.svg)
 
 The database is built using SQLAlchemy and Pydantic to provide both ORM capabilities and data validation through Python type hints.
+
+## Message Queue (Kafka)
+
+The application incorporates an asynchronous event-driven pipeline powered by **Apache Kafka**:
+- **Topics**:
+  - `flashcard-reviews`: Published every time a user reviews a flashcard (`CardReviewedEvent`).
+  - `flashcard-created`: Published when a new word card is added (`CardCreatedEvent`).
+- **Producer**: Non-blocking `KafkaEventProducer` built on `aiokafka` with graceful degradation if the broker is offline.
+- **Consumer / Worker**: Standalone worker service `app.kafka.worker` that consumes events, processes user learning statistics, and handles background tasks.
+- **Running the Worker**:
+  ```bash
+  python -m app.kafka.worker
+  ```
 
 ## Docker Compose
 

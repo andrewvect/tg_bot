@@ -1,9 +1,11 @@
-from venv import logger
-
-# ensure Security is imported
 from fastapi import APIRouter, HTTPException, Security
 
-from app.api.deps import IdempotencyStoreDep, WordCardHandlerDep, verify_token
+from app.api.deps import (
+    IdempotencyStoreDep,
+    KafkaProducerDep,
+    WordCardHandlerDep,
+    verify_token,
+)
 from app.common.shemas.words import (
     NewCardRequest,
     NewCardResponce,
@@ -13,6 +15,9 @@ from app.common.shemas.words import (
     WordResponse,
     WordsResponse,
 )
+from app.core.config import settings
+from app.kafka import CardCreatedEvent, CardReviewedEvent
+from app.utils.logger import logger
 from app.words.words_service import EndWordsInDb, EndWordsToReview
 
 router = APIRouter(prefix="/cards", tags=["utils"])
@@ -22,6 +27,7 @@ router = APIRouter(prefix="/cards", tags=["utils"])
 async def new_card(
     request: NewCardRequest,
     word_service: WordCardHandlerDep,
+    kafka_producer: KafkaProducerDep,
     user_id: int = Security(verify_token),
 ) -> NewCardResponce:
     """Create a new card for the user after verifying the token"""
@@ -31,7 +37,19 @@ async def new_card(
             known=request.known,
             word_id=request.word_id,
         )
-        return NewCardResponce(**created_card.__dict__)
+        response = NewCardResponce(**created_card.__dict__)
+
+        await kafka_producer.publish(
+            topic=settings.KAFKA_CARD_CREATED_TOPIC,
+            event=CardCreatedEvent(
+                user_id=user_id,
+                word_id=request.word_id,
+                known=request.known,
+            ),
+            key=str(user_id),
+        )
+
+        return response
     except ValueError as e:
         logger.error("Error while creating new card: %s", e)
         raise HTTPException(status_code=400, detail=str(e)) from e
@@ -76,6 +94,7 @@ async def add_review(
     request: ReviewRequest,
     word_service: WordCardHandlerDep,
     idempotency_store: IdempotencyStoreDep,
+    kafka_producer: KafkaProducerDep,
     user_id: int = Security(verify_token),
 ) -> ReviewResponse:
     """Add review to word card with idempotency support"""
@@ -90,6 +109,17 @@ async def add_review(
         user_id=user_id,
         passed=request.passed,
         word_id=request.word_id,
+    )
+
+    # Publish event to Kafka
+    await kafka_producer.publish(
+        topic=settings.KAFKA_CARD_REVIEWS_TOPIC,
+        event=CardReviewedEvent(
+            user_id=user_id,
+            word_id=request.word_id,
+            passed=request.passed,
+        ),
+        key=str(user_id),
     )
 
     # Create response

@@ -14,6 +14,7 @@ from starlette.middleware.cors import CORSMiddleware
 from app.api.main import api_router
 from app.common.cache.idempotency_backend import BoundedMemoryBackend
 from app.core.config import settings
+from app.kafka import kafka_producer
 from app.scripts.set_up_bot import set_up_bot as set_telegram_bot
 from app.states import get_users_states
 from app.utils.logger import logger
@@ -21,10 +22,15 @@ from app.utils.logger import logger
 
 @asynccontextmanager
 async def set_up(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa
-    """Set up user states."""
+    """Set up application services, Kafka producer, and user states."""
     await set_telegram_bot(mode=settings.ENVIRONMENT)
     await get_users_states()
-    yield
+    await kafka_producer.start()
+    app.state.kafka_producer = kafka_producer
+    try:
+        yield
+    finally:
+        await kafka_producer.stop()
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
@@ -69,8 +75,7 @@ def create_app() -> FastAPI:
             if path_key.startswith("/api/v1/cards"):  # Target only card endpoints
                 for operation_key in path_item:
                     if operation_key in ["get", "post", "patch", "put", "delete"]:
-                        path_item[operation_key]["security"] = [
-                            {"BearerAuth": []}]
+                        path_item[operation_key]["security"] = [{"BearerAuth": []}]
 
         app.openapi_schema = openapi_schema
         return app.openapi_schema
@@ -79,9 +84,7 @@ def create_app() -> FastAPI:
     app.openapi = custom_openapi
 
     @app.exception_handler(Exception)
-    async def generic_exception(
-        request: Request, exc: Exception
-    ):
+    async def generic_exception(request: Request, exc: Exception):
         """Handle exceptions globally."""
         from fastapi.responses import JSONResponse
 

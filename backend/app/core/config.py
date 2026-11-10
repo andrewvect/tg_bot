@@ -105,6 +105,13 @@ class Settings(BaseSettings):
 
     ADMIN_TG_ID: int | None = None
 
+    # Kafka configuration
+    KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
+    KAFKA_CARD_REVIEWS_TOPIC: str = "flashcard-reviews"
+    KAFKA_CARD_CREATED_TOPIC: str = "flashcard-created"
+    KAFKA_CONSUMER_GROUP: str = "flashcard-service-group"
+    KAFKA_ENABLED: bool = True
+
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
             message = (
