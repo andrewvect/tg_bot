@@ -1,52 +1,27 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Button, Text, AbsoluteCenter, VStack, Stack, List, ListItem, Radio, RadioGroup } from "@chakra-ui/react"
 import BackgroundBox from '../components/back'
-import { useState, useEffect } from 'react'
-import { SettingsService } from '../client/sdk.gen'
-import type {
-    SettingsGetUserSettingsResponse,
-} from '../client/types.gen'
-import Loading from '../components/Common/Loading' // Import the Loading component
+import Loading from '../components/Common/Loading'
+import { useSettingsPresenter, START_WORD_RANK_OPTIONS } from '../presenters/useSettingsPresenter'
 
 export const Route = createFileRoute('/settings')({
-    component: NewWord,
+    component: SettingsPage,
 })
 
-function NewWord() {
+function SettingsPage() {
     const navigate = useNavigate()
-    const [displaySetting, setDisplaySetting] = useState('4') // Default value
-    const [alphabetSetting, setAlphabetSetting] = useState('4') // Default value
-    const [loading, setLoading] = useState(true) // New loading state
-
-    useEffect(() => {
-        SettingsService.getUserSettings()
-            .then((res: SettingsGetUserSettingsResponse) => {
-                setDisplaySetting(String(res.spoiler_settings))
-                setAlphabetSetting(String(res.alphabet_settings))
-            })
-            .catch(err => console.error(err))
-            .finally(() => setLoading(false)) // Set loading to false after fetching
-    }, [])
-
-    const handleChange = async (spoilerSettingValue?: string, alphabetSettingsValue?: string) => {
-        const newDisplay = spoilerSettingValue !== undefined ? spoilerSettingValue : displaySetting;
-        const newAlphabet = alphabetSettingsValue !== undefined ? alphabetSettingsValue : alphabetSetting;
-        setDisplaySetting(newDisplay);
-        setAlphabetSetting(newAlphabet);
-        try {
-            await SettingsService.setUserSettings({
-                requestBody: {
-                    spoiler_settings: Number(newDisplay),
-                    alphabet_settings: Number(newAlphabet),
-                }
-            });
-        } catch (err) {
-            console.error(err);
-        }
-    }
+    const {
+        loading,
+        displaySetting,
+        alphabetSetting,
+        startWordRank,
+        setDisplaySetting,
+        setAlphabetSetting,
+        setStartWordRank,
+    } = useSettingsPresenter()
 
     if (loading) {
-        return <Loading /> // Render the Loading component while loading
+        return <Loading />
     }
 
     return (
@@ -67,7 +42,7 @@ function NewWord() {
                         <ListItem>
                             <Stack mt={2}>
                                 <Text fontSize="3xl" fontWeight="bold" color="white">Показывать первым</Text>
-                                <RadioGroup value={displaySetting} onChange={(value) => handleChange(value, undefined)}>
+                                <RadioGroup value={displaySetting} onChange={setDisplaySetting}>
                                     <Stack direction="column">
                                         <Radio value="2" colorScheme="whiteAlpha">
                                             <Text fontSize="2xl" color="white">Сербское</Text>
@@ -81,7 +56,7 @@ function NewWord() {
                                     </Stack>
                                 </RadioGroup>
                                 <Text fontSize="3xl" fontWeight="bold" color="white">Алфавит</Text>
-                                <RadioGroup value={alphabetSetting} onChange={(value) => handleChange(undefined, value)}>
+                                <RadioGroup value={alphabetSetting} onChange={setAlphabetSetting}>
                                     <Stack direction="column">
                                         <Radio value="3" colorScheme="whiteAlpha">
                                             <Text fontSize="2xl" color="white">Латинский</Text>
@@ -92,6 +67,18 @@ function NewWord() {
                                         <Radio value="1" colorScheme="whiteAlpha">
                                             <Text fontSize="2xl" color="white">Оба</Text>
                                         </Radio>
+                                    </Stack>
+                                </RadioGroup>
+                                <Text fontSize="3xl" fontWeight="bold" color="white">Начать со слова</Text>
+                                <RadioGroup value={startWordRank} onChange={setStartWordRank}>
+                                    <Stack direction="column">
+                                        {START_WORD_RANK_OPTIONS.map((rank) => (
+                                            <Radio key={rank} value={String(rank)} colorScheme="whiteAlpha">
+                                                <Text fontSize="2xl" color="white">
+                                                    {rank === 0 ? 'С начала' : `Со слова №${rank}`}
+                                                </Text>
+                                            </Radio>
+                                        ))}
                                     </Stack>
                                 </RadioGroup>
                             </Stack>

@@ -1,39 +1,61 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.common.db.models import Invoice, Sentence, Statistic, Texts, UserText
+
 from .repositories import (
     CardRepo,
+    CardRepoProtocol,
     InvoiceRepo,
+    RepositoryProtocol,
     SentenceRepo,
     SettingsRepo,
+    SettingsRepoProtocol,
     StatisticsRepo,
     TextsRepo,
     UserRepo,
+    UserRepoProtocol,
     UserTextRepo,
     WordRepo,
+    WordRepoProtocol,
 )
 
 
 class Database:
-    user: UserRepo
-    card: CardRepo
-    word: WordRepo
-    sentence: SentenceRepo
-    settings: SettingsRepo
+    """Aggregates all repositories behind their interfaces.
+
+    Attributes and constructor parameters are typed against the repository
+    Protocols, not the concrete classes - so anything that receives a
+    Database (WordCardHandler, ...) only ever sees the interface, and a
+    fake repository can be substituted here (e.g. in a test) without this
+    class or its consumers changing. Constructing the real, concrete repos
+    is this class's own job as the composition root; that's the one place
+    that is allowed - and expected - to know about them.
+    """
+
+    user: UserRepoProtocol
+    card: CardRepoProtocol
+    word: WordRepoProtocol
+    sentence: RepositoryProtocol[Sentence]
+    settings: SettingsRepoProtocol
+    statistic: RepositoryProtocol[Statistic]
+    invoice: RepositoryProtocol[Invoice]
+    texts: RepositoryProtocol[Texts]
+    user_text: RepositoryProtocol[UserText]
 
     session: AsyncSession
 
     def __init__(
         self,
         session: AsyncSession,
-        user: UserRepo | None = None,
-        card: CardRepo | None = None,
-        word: WordRepo | None = None,
-        sentence: SentenceRepo | None = None,
-        settings: SettingsRepo | None = None,
-        statistic: StatisticsRepo | None = None,
-        invoice: InvoiceRepo | None = None,
-        texts: TextsRepo | None = None,
-        user_text: UserTextRepo | None = None,
+        user: UserRepoProtocol | None = None,
+        card: CardRepoProtocol | None = None,
+        word: WordRepoProtocol | None = None,
+        sentence: RepositoryProtocol[Sentence] | None = None,
+        settings: SettingsRepoProtocol | None = None,
+        statistic: RepositoryProtocol[Statistic] | None = None,
+        invoice: RepositoryProtocol[Invoice] | None = None,
+        texts: RepositoryProtocol[Texts] | None = None,
+        user_text: RepositoryProtocol[UserText] | None = None,
     ):
         """Init database."""
         self.session = session

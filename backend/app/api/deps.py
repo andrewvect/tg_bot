@@ -78,24 +78,6 @@ IdempotencyStoreDep = Annotated[IdempotencyStore,
                                 Depends(get_idempotency_store)]
 
 
-def get_word_card_handler(db: DbDep, cache: CacheDep) -> WordCardHandler:
-    """Get an instance of WordCardHandler with database session and cache dependencies."""
-
-    # Create a wrapper to convert the int timestamp to datetime
-    def review_algorithm_wrapper(
-        checks: int, passed: bool = True, review_date: datetime | None = None
-    ) -> datetime:
-        timestamp = review_algorithm(checks, passed, review_date)
-        return datetime.fromtimestamp(timestamp)
-
-    return WordCardHandler(
-        db=db, cache=cache, review_algorithm=review_algorithm_wrapper
-    )
-
-
-WordCardHandlerDep = Annotated[WordCardHandler, Depends(get_word_card_handler)]
-
-
 def get_tokens_service() -> TokensService:
     return TokensService(
         config=settings, safe_parse_webapp_init_data=safe_parse_webapp_init_data
@@ -120,6 +102,29 @@ def get_settings_service(
 
 
 SettingsServiceDep = Annotated[SettingService, Depends(get_settings_service)]
+
+
+def get_word_card_handler(
+    db: DbDep, cache: CacheDep, settings_service: SettingsServiceDep
+) -> WordCardHandler:
+    """Get an instance of WordCardHandler with database session and cache dependencies."""
+
+    # Create a wrapper to convert the int timestamp to datetime
+    def review_algorithm_wrapper(
+        checks: int, passed: bool = True, review_date: datetime | None = None
+    ) -> datetime:
+        timestamp = review_algorithm(checks, passed, review_date)
+        return datetime.fromtimestamp(timestamp)
+
+    return WordCardHandler(
+        db=db,
+        cache=cache,
+        review_algorithm=review_algorithm_wrapper,
+        settings_service=settings_service,
+    )
+
+
+WordCardHandlerDep = Annotated[WordCardHandler, Depends(get_word_card_handler)]
 
 # Set auto_error to True to enforce that the Authorization header is required
 security_dep = HTTPBearer()

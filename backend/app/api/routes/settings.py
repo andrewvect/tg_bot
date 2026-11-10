@@ -17,6 +17,7 @@ async def get_user_settings(
         spoiler_settings=user.spoiler_settings,
         user_id=user.user_id,
         alphabet_settings=user.alphabet_settings,
+        start_word_rank=user.start_word_rank,
     )
 
 
@@ -32,4 +33,5 @@ async def set_user_settings(
         spoiler_settings=user.spoiler_settings,
         user_id=user.user_id,
         alphabet_settings=user.alphabet_settings,
+        start_word_rank=user.start_word_rank,
     )

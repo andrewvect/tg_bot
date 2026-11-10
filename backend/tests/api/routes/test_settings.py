@@ -24,6 +24,7 @@ async def test_get_user_settings(
         "spoiler_settings": test_user_settings.spoiler_settings,
         "user_id": test_user.telegram_id,
         "alphabet_settings": test_user_settings.alphabet_settings,
+        "start_word_rank": test_user_settings.start_word_rank,
     }
 
 
@@ -46,6 +47,7 @@ async def test_set_user_settings(
         "user_id": test_user.telegram_id,
         "spoiler_settings": 2,
         "alphabet_settings": 2,
+        "start_word_rank": 0,
     }
     # check db
     db_session.refresh(test_user_settings)

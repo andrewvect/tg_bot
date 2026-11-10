@@ -7,6 +7,9 @@ import pytest
 from httpx import AsyncClient
 
 from app.api.deps import get_bot_instance
+from app.core.config import settings
+
+WEBHOOK_SECRET_HEADERS = {"X-Telegram-Bot-Api-Secret-Token": settings.TELEGRAM_WEBHOOK_SECRET}
 
 
 @pytest.mark.asyncio
@@ -48,6 +51,7 @@ async def test_webhook_idempotency_prevents_duplicate_processing(
         "/api/v1/webhook/",
         json=webhook_data,
         headers={
+            **WEBHOOK_SECRET_HEADERS,
             "Idempotency-Key": idempotency_key,
         },
     )
@@ -59,6 +63,7 @@ async def test_webhook_idempotency_prevents_duplicate_processing(
         "/api/v1/webhook/",
         json=webhook_data,
         headers={
+            **WEBHOOK_SECRET_HEADERS,
             "Idempotency-Key": idempotency_key,
         },
     )
@@ -130,6 +135,7 @@ async def test_webhook_idempotency_different_updates_processed_separately(
         "/api/v1/webhook/",
         json=webhook_data1,
         headers={
+            **WEBHOOK_SECRET_HEADERS,
             "Idempotency-Key": idempotency_key1,
         },
     )
@@ -141,6 +147,7 @@ async def test_webhook_idempotency_different_updates_processed_separately(
         "/api/v1/webhook/",
         json=webhook_data2,
         headers={
+            **WEBHOOK_SECRET_HEADERS,
             "Idempotency-Key": idempotency_key2,
         },
     )
@@ -183,6 +190,7 @@ async def test_webhook_without_idempotency_key_works(
     response = await client.post(
         "/api/v1/webhook/",
         json=webhook_data,
+        headers=WEBHOOK_SECRET_HEADERS,
     )
 
     assert response.status_code == 200
@@ -228,6 +236,7 @@ async def test_webhook_idempotency_multiple_rapid_requests(
             "/api/v1/webhook/",
             json=webhook_data,
             headers={
+                **WEBHOOK_SECRET_HEADERS,
                 "Idempotency-Key": idempotency_key,
             },
         )

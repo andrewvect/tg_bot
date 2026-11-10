@@ -170,8 +170,9 @@ def db_with_words(request: pytest.FixtureRequest, db_session: Session) -> list[W
     faker = Faker()
     ru_faker = Faker("ru_RU")
     words = []
-    for _ in range(count):
+    for i in range(count):
         word = Word(
+            rank=i + 1,
             latin_word=faker.unique.word(),
             native_word=ru_faker.unique.word(),
             legend=faker.sentence(),

@@ -7,11 +7,12 @@ import { routeTree } from "./routeTree.gen"
 
 import { StrictMode } from "react"
 import { OpenAPI } from "./client"
+import { tokenStorage } from "./services/localStorage"
 import theme from "./theme"
 
 OpenAPI.BASE = import.meta.env.VITE_API_URL
 OpenAPI.TOKEN = async () => {
-  return localStorage.getItem("token") || "some_token"
+  return tokenStorage.get() || "some_token"
 }
 
 const queryClient = new QueryClient()
@@ -22,8 +23,6 @@ declare module "@tanstack/react-router" {
     router: typeof router
   }
 }
-
-const reviewCount = localStorage.getItem("review_words_count")
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>

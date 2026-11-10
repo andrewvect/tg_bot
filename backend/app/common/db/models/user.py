@@ -20,6 +20,21 @@ class User(Base):
     """User model."""
 
     # Fields
+
+    # Override Base.id: telegram_id is the real identity of a user (every
+    # other table's FK points at user.telegram_id, never at this column), so
+    # it must be the sole primary key. Without this override, User would
+    # inherit Base's autoincrementing `id` as primary_key=True too, giving
+    # the table an unintended composite primary key of (telegram_id, id) and
+    # a meaningless internal id that nothing else references.
+    id: Mapped[int] = mapped_column(
+        sa.Integer,
+        sa.Sequence("user_id_seq"),
+        autoincrement=True,
+        unique=True,
+        nullable=False,
+    )
+
     telegram_id: Mapped[int] = mapped_column(
         sa.BigInteger, unique=True, nullable=False, index=True, primary_key=True
     )

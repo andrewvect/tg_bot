@@ -2,6 +2,13 @@
 
 from .abstract import Repository
 from .card import CardRepo, CardRetriever
+from .interfaces import (
+    CardRepoProtocol,
+    RepositoryProtocol,
+    SettingsRepoProtocol,
+    UserRepoProtocol,
+    WordRepoProtocol,
+)
 from .invoice import InvoiceRepo
 from .sentence import SentenceRepo
 from .settings import SettingsRepo
@@ -13,15 +20,19 @@ from .word import WordRepo
 
 __all__ = (
     "UserRepo",
+    "UserRepoProtocol",
     "Repository",
+    "RepositoryProtocol",
     "CardRepo",
+    "CardRepoProtocol",
     "WordRepo",
+    "WordRepoProtocol",
     "SentenceRepo",
     "TextsRepo",
     "CardRetriever",
-    "CardRepo",
     "InvoiceRepo",
     "SettingsRepo",
+    "SettingsRepoProtocol",
     "StatisticsRepo",
     "UserTextRepo",
 )

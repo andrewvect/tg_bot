@@ -30,6 +30,7 @@ export type ResponceToken = {
 export type ReviewRequest = {
   passed: boolean
   word_id: number
+  idempotency_key: string
 }
 
 export type ReviewResponse = {
@@ -47,6 +48,7 @@ export type SettingsResponse = {
   spoiler_settings: number
   user_id: number
   alphabet_settings: number
+  start_word_rank: number
 }
 
 export type SettingsUpdateRequest = {
@@ -58,6 +60,10 @@ export type SettingsUpdateRequest = {
    * Must be 1, 2, or 3
    */
   alphabet_settings: number
+  /**
+   * Word level to start from: 0, 1000, 2000, ...
+   */
+  start_word_rank?: number
 }
 
 export type ValidationError = {
@@ -79,7 +85,9 @@ export type WordsResponse = {
   words: Array<WordResponse>
 }
 
-export type HealthCheckHealthCheckResponse = unknown
+export type HealthCheckHealthCheckResponse = {
+  [key: string]: string
+}
 
 export type LoginLoginAccessTokenData = {
   requestBody: RequestInitData

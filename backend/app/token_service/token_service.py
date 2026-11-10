@@ -45,3 +45,5 @@ class TokensService:
             return user_id
         except jwt.ExpiredSignatureError:
             raise ValueError("Token has expired")
+        except jwt.JWTError:
+            raise ValueError("Invalid token")
